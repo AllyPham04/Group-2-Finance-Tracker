@@ -25,6 +25,8 @@ selected = option_menu(menu_title=None,
 
 if selected == "Set Budget":
     pass
+    #code ở đây
+
 
 if selected == "Tracker":
     st.header(f"Income")
