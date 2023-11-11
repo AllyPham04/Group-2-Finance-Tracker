@@ -10,6 +10,8 @@ currency = "VND"
 page_title = "Personal Finance Tracker"
 page_icon = ":money_with_wings:"  # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
 layout = "centered"
+user_income = []
+user_expense = []
 # --------------------------------------
 
 st.set_page_config(page_title=page_title, page_icon=page_icon, layout=layout)
@@ -49,9 +51,12 @@ if selected == "Tracker":
 
                 # Write the user's data
                 writer.writerow(user_data)
-                
+            
+            user_income.append({"Category:": category, "Amount": amount})
+            st.write(f"Category: {category} - {amount}")
             st.success("Data saved!")
     
+
     st.header(f"Expense")
     with st.form("expense_form", clear_on_submit=True):
         selected_date = st.date_input("Select date:", format="DD/MM/YYYY")
@@ -74,6 +79,7 @@ if selected == "Tracker":
                 writer.writerow(user_data)
                 
             st.success("Data saved!")
+
 
 if selected == "Visualization":
     st.header("Visualization")
