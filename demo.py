@@ -1,7 +1,7 @@
-import plotly.express as px
+#import plotly.express as px
 import streamlit as st 
-from streamlit_option_menu import option_menu 
-import csv
+#from streamlit_option_menu import option_menu 
+#import csv
 from config import *
 from menu import get_selected_option
 from account import app as account_app
