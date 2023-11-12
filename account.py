@@ -21,14 +21,21 @@ def app():
 
     st.header("**Transaction**")
     
-    df = pd.read_csv('data.csv')
+    if os.path.exists('data.csv'):
+        df = pd.read_csv('data.csv')
+    else:
+        df = pd.DataFrame()
 
-    df = df.sort_values(by='Date', ascending=False)
+    if not df.empty:
+        df = df.sort_values(by='Date', ascending=False)
 
-    for _, transaction in df.iterrows():
-        st.write(f'{transaction["Category"]} ({transaction["Date"]})')
-        amount = transaction["Amount"]
-        if transaction["Type"] == "Income":
-            st.write(f'* +{amount} {currency}')
-        elif transaction["Type"] == "Expense":
-            st.write(f'* -{amount} {currency}')
+        for date, transactions in df.groupby('Date'):
+            st.subheader(date)
+            for _, transaction in transactions.iterrows():
+                col1, col2 = st.columns(2)
+            
+                amount = transaction["Amount"]
+                if transaction["Type"] == "Income":
+                    col1.write(f'{transaction["Category"]}: +{amount} {currency}')
+                elif transaction["Type"] == "Expense":
+                    col2.write(f'{transaction["Category"]}: -{amount} {currency}')
