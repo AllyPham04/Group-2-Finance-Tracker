@@ -1,5 +1,6 @@
 import streamlit as st
 from config import *
+import os
 import pandas as pd
 
 def app():
@@ -16,7 +17,7 @@ def app():
             
             try:
                 df = pd.read_csv('data.csv')
-            except FileNotFoundError:
+            except (FileNotFoundError, pd.errors.EmptyDataError):
                 df = pd.DataFrame(columns=user_data.keys())
             
             df = pd.concat([df, pd.DataFrame(user_data, index=[0])], ignore_index=True)
