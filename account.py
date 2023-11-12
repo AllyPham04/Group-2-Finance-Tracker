@@ -1,9 +1,13 @@
 import streamlit as st
 from config import *
+from tracker import *
+
+if 'user_name' not in st.session_state:
+    st.session_state['user_name'] = ''
 
 def app():
-    user_name = st.text_input(f'Name:', "Enter your name")
-    st.header(f"Welcome, {user_name}!")
+    st.session_state['user_name'] = st.text_input(f'Name:', st.session_state['user_name'])
+    st.header(f"Welcome, {st.session_state['user_name']}!")
     total_balance = 0
     total_income = 0
     total_expense = 0
@@ -17,10 +21,14 @@ def app():
 
     st.header("**Transaction**")
     
-    for transaction in transactions:
+    df = pd.read_csv('data.csv')
+
+    df = df.sort_values(by='Date', ascending=False)
+
+    for _, transaction in df.iterrows():
         st.write(f'{transaction["Category"]} ({transaction["Date"]})')
         amount = transaction["Amount"]
         if transaction["Type"] == "Income":
-            st.write(f'+ {amount} {currency}')
-        else:
-            st.write(f'- {amount} {currency}')
+            st.write(f'* +{amount} {currency}')
+        elif transaction["Type"] == "Expense":
+            st.write(f'* -{amount} {currency}')
