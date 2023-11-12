@@ -4,7 +4,7 @@ from tracker import *
 
 def app():
     if 'user_name' not in st.session_state:
-        st.session_state['user_name'] = ''
+        st.session_state['user_name'] = ' '
 
     st.session_state['user_name'] = st.text_input(f'Name:', st.session_state['user_name'])
     st.header(f"Welcome, {st.session_state['user_name']}!")
@@ -27,9 +27,9 @@ def app():
         df = pd.DataFrame()
 
     if not df.empty:
-        df = df.sort_values(by='Date', ascending=False)
-
+        
         for date, transactions in df.groupby('Date'):
+            df = df.sort_values(by='Date', ascending=False)
             st.subheader(date)
             for _, transaction in transactions.iterrows():
                 col1, col2 = st.columns(2)
