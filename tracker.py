@@ -24,7 +24,7 @@ def app():
             df.to_csv('data.csv', index=False)
             
             user_income.append({"Category:": category, "Amount": amount})
-            st.write(f"Category: {category}: {amount} {currency}")
+            st.write(f"{category}: {amount} {currency}")
             st.success("Data saved!")
             transactions.append(user_data)
     
