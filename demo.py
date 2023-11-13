@@ -18,6 +18,8 @@ selected = get_selected_option()
 #-------------
 
 if selected == "Account":
+    user_name = st.text_input("Enter your name:")
+    st.header(f"Welcome, {user_name}!")
     account_app()
 
 if selected == "Set Budget":
