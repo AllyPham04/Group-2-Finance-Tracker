@@ -6,10 +6,10 @@ from datetime import datetime
 from account import user_income, user_expense
 
 def app():
-    col_a, col_b = st.columns(2)
+    col_a1, col_a2 = st.columns(2)
 
-    with col_a:
-        with st.form("add_transaction"):
+    with col_a1:
+        with st.form("add_transaction", clear_on_submit=True):
             st.subheader("Transaction")
             type = st.radio("Type:",
                             ["Income", "Expense"])
@@ -64,8 +64,8 @@ def app():
                     st.success("Data saved!")
                     user_expense.append({"Category:": category, "Amount": amount})
 
-    with col_b:
-        with st.form("transactions_history"):
+    with col_a2:
+        with st.form("transactions_history", clear_on_submit=True):
             st.subheader("History")
             if os.path.exists('data.csv'):
                 df = pd.read_csv('data.csv')
