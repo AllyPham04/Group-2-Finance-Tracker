@@ -1,7 +1,5 @@
-from streamlit_option_menu import option_menu 
+import streamlit as st
 
 def get_selected_option():
-    return option_menu(menu_title=None, 
-                       options=["Account", "Set Budget", "Tracker", "Report"], 
-                       icons=["coin", "database-fill", "bar-chart"], 
-                       orientation="horizontal")
+    return st.sidebar.radio(label="Menu", 
+                                options=["Account", "Set Budget", "Tracker", "Report"])
