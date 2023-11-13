@@ -18,7 +18,7 @@ def app():
             if type == "Income":
                 category = st.selectbox("Category:", incomes)
                 if st.form_submit_button("Save Data"):
-                    period = selected_date.strftime("%d-%m-%Y")
+                    period = selected_date.strftime("%H:%M:%S %d-%m-%Y")
                     # Gather user inputs
                     user_data = {
                         'Type': 'Income',
@@ -33,6 +33,7 @@ def app():
                         df = pd.DataFrame(columns=user_data.keys())
                         
                     df = pd.concat([df, pd.DataFrame(user_data, index=[0])], ignore_index=True)
+                    df = df.sort_values(by=['Date'], ascending=False)
                     df.to_csv('data.csv', index=False)
 
                     st.write(f"{category}: {amount} {currency}")
@@ -41,7 +42,7 @@ def app():
             if type == "Expense":
                 category = st.selectbox("Category:", expenses)
                 if st.form_submit_button("Save Data"):
-                    period = selected_date.strftime("%d-%m-%Y")
+                    period = selected_date.strftime("%H:%M:%S %d-%m-%Y")
                     # Gather user inputs
                     user_data = {
                         'Type': 'Expense',
@@ -56,6 +57,7 @@ def app():
                         df = pd.DataFrame(columns=user_data.keys())
                         
                     df = pd.concat([df, pd.DataFrame(user_data, index=[0])], ignore_index=True)
+                    df = df.sort_values(by=['Date'], ascending=False)
                     df.to_csv('data.csv', index=False)
 
                     st.write(f"{category}: {amount} {currency}")
@@ -71,14 +73,8 @@ def app():
                 df = pd.DataFrame()
 
             if not df.empty:
-                for date, giao_dich in df.groupby("Date", sort=True):
-                    st.subheader(date)
-                    for _, transaction in giao_dich.iterrows():
-                        amount = transaction["Amount"]
-                        if transaction["Type"] == "Income":
-                            st.write(f'- {transaction["Category"]}: \+ {amount} {currency}')
-                        elif transaction["Type"] == "Expense":
-                            st.write(f'- {transaction["Category"]}: \- {amount} {currency}')
+                df['Amount'] = df.apply(lambda row: f'+ {row["Amount"]} {currency}' if row['Type'] == 'Income' else f'- {row["Amount"]} {currency}', axis=1)
+                st.table(df.drop(columns=['Type']))
 
             if st.form_submit_button("Clear all data"):
                 st.session_state.clear()
