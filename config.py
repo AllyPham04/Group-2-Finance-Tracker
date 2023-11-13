@@ -1,4 +1,4 @@
-incomes = ["Salary", "Pocket Money", "Bonus", "Side Job", "Investment", "Other Income"]
+incomes = ["Salary", "Saving", "Bonus", "Side Job", "Investment", "Other Income"]
 expenses = ["Food", "Clothes", "Houseware", "Cosmetic", "Exchange", "Education", "Electric Bill", "Transportation", "Other Expense"]
 currency = "VND"
 page_title = "Personal Finance Tracker"
