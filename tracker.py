@@ -7,10 +7,10 @@ from account import user_income, user_expense
 
 def app():
     col_a, col_b = st.columns(2)
-    col_a1, col_a2 = col_a.columns(2)
 
     with col_a:
         with st.form("add_transaction"):
+            st.subheader("Transaction")
             type = st.radio("Type:",
                             ["Income", "Expense"])
             selected_date = st.date_input("Select date:", value=datetime.today(), format="DD/MM/YYYY")
@@ -64,7 +64,7 @@ def app():
 
     with col_b:
         with st.form("transactions_history"):
-            st.header("Transactions")
+            st.subheader("History")
             if os.path.exists('data.csv'):
                 df = pd.read_csv('data.csv')
             else:
