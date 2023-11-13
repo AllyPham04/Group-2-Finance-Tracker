@@ -3,26 +3,34 @@ import os
 import pandas as pd
 from config import *
 from datetime import datetime
-from account import user_income, user_expense
 
 def app():
     col_a1, col_a2 = st.columns(2)
+    now = datetime.now()
 
+    total_balance = 0
+    total_income = 0
+    total_expense = 0
+
+    for income in user_income:
+        total_income += income["Amount"]
+    for expense in user_expense:
+        total_expense += expense["Amount"]
+    total_balance = total_income - total_expense
     with col_a1:
         with st.form("add_transaction", clear_on_submit=True):
             st.subheader("Transaction")
             type = st.radio("Type:",
                             ["Income", "Expense"])
-            selected_date = st.date_input("Select date:", value=datetime.today(), format="DD/MM/YYYY")
+            st.date_input("Select date:", value=datetime.today(), format="DD/MM/YYYY")
             amount = st.number_input(f"Amount:", min_value=0, format="%i", step=10, key="amount_input")
             if type == "Income":
                 category = st.selectbox("Category:", incomes)
                 if st.form_submit_button("Save Data"):
-                    period = selected_date.strftime("%H:%M:%S %d-%m-%Y")
                     # Gather user inputs
                     user_data = {
                         'Type': 'Income',
-                        'Date': period,
+                        'Date': now.strftime("%H:%M:%S %d-%m-%Y"),
                         'Category': category,
                         'Amount': amount
                     }
@@ -34,7 +42,7 @@ def app():
                         
                     df = pd.concat([df, pd.DataFrame(user_data, index=[0])], ignore_index=True)
                     df = df.sort_values(by=['Date'], ascending=False)
-                    df.to_csv('data.csv', index=False)
+                    df.to_csv('data.csv', index=False, date_format='%d-%m-%Y %H:%M:%S')
 
                     st.write(f"{category}: {amount} {currency}")
                     st.success("Data saved!")
@@ -42,11 +50,10 @@ def app():
             if type == "Expense":
                 category = st.selectbox("Category:", expenses)
                 if st.form_submit_button("Save Data"):
-                    period = selected_date.strftime("%H:%M:%S %d-%m-%Y")
                     # Gather user inputs
                     user_data = {
                         'Type': 'Expense',
-                        'Date': period,
+                        'Date': now.strftime("%H:%M:%S %d-%m-%Y"),
                         'Category': category,
                         'Amount': amount
                     }
@@ -58,7 +65,7 @@ def app():
                         
                     df = pd.concat([df, pd.DataFrame(user_data, index=[0])], ignore_index=True)
                     df = df.sort_values(by=['Date'], ascending=False)
-                    df.to_csv('data.csv', index=False)
+                    df.to_csv('data.csv', index=False, date_format='%d-%m-%Y %H:%M:%S')
 
                     st.write(f"{category}: {amount} {currency}")
                     st.success("Data saved!")
@@ -73,6 +80,7 @@ def app():
                 df = pd.DataFrame()
 
             if not df.empty:
+                df.index = df.index + 1
                 df['Amount'] = df.apply(lambda row: f'+ {row["Amount"]} {currency}' if row['Type'] == 'Income' else f'- {row["Amount"]} {currency}', axis=1)
                 st.table(df.drop(columns=['Type']))
 
