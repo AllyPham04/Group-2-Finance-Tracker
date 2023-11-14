@@ -112,4 +112,9 @@ with col_a1:
     total_balance_millified = millify(total_balance, precision=2)
     st.metric("Total Credits", f"{total_balance_millified} {currency}", delta=f"{delta_balance_millified} {currency}", delta_color="normal")
     
-#with col_a2:
+with col_a2:
+    pass
+
+with col_a3:
+    pass
+    #code ở đây
