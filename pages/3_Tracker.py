@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from config import *
 from datetime import datetime
+from millify import millify
 
 st.title("Tracker")
 col_a1, col_a2, col_a3 = st.columns([1, 1, 2])
@@ -12,6 +13,11 @@ now = datetime.now()
 total_balance = 0
 total_income = 0
 total_expense = 0
+
+if 'previous_total_balance' not in st.session_state:
+    st.session_state['previous_total_balance'] = 0
+
+previous_total_balance = st.session_state['previous_total_balance']
 
 with col_b1:
     tab1, tab2 = st.tabs(["Income", "Expense"])
@@ -95,8 +101,13 @@ with col_b2:
                 st.success("Data cleared!")
             user_income.clear()
             user_expense.clear()
-    
+st.session_state['previous_total_balance'] = total_balance
+
+delta_balance = total_balance - previous_total_balance
+delta_balance_millified = millify(delta_balance, precision=2)
+
 with col_a1:
-    st.metric("Total Credits", f"{total_balance} {currency}")
+    total_balance_millified = millify(total_balance, precision=2)
+    st.metric("Total Credits", f"{total_balance_millified} {currency}", delta=f"{delta_balance_millified} {currency}", delta_color="normal")
     
 #with col_a2:
