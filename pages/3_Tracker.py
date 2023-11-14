@@ -43,8 +43,9 @@ with col_b1:
                     history_df = pd.DataFrame(columns=user_data.keys())
                                 
                 history_df = pd.concat([history_df, pd.DataFrame(user_data, index=[0])], ignore_index=True)
+                history_df['Date'] = pd.to_datetime(history_df['Date'], format="%d-%m-%Y")
                 history_df = history_df.sort_values(by=['Date'], ascending=False)
-                history_df.to_csv('data.csv', index=False, date_format='%H:%M:%S')
+                history_df.to_csv('data.csv', index=False, date_format="%d-%m-%Y")
 
                 st.success("Data saved!")
 
@@ -69,8 +70,9 @@ with col_b1:
                     history_df = pd.DataFrame(columns=user_data.keys())
                             
                 history_df = pd.concat([history_df, pd.DataFrame(user_data, index=[0])], ignore_index=True)
+                history_df['Date'] = pd.to_datetime(history_df['Date'], format="%d-%m-%Y")
                 history_df = history_df.sort_values(by=['Date'], ascending=False)
-                history_df.to_csv('data.csv', index=False, date_format='%H:%M:%S')
+                history_df.to_csv('data.csv', index=False, date_format="%d-%m-%Y")
 
                 st.success("Data saved!")
             
