@@ -10,7 +10,6 @@ col_a1, col_a2, col_a3 = st.columns([1, 1, 2])
 col_b1, col_b2 = st.columns(2)
 now = datetime.now()
 
-total_balance = 0
 total_income = 0
 total_expense = 0
 
@@ -81,7 +80,7 @@ with col_b2:
     with st.form("transactions_history", clear_on_submit=True):
         st.subheader("History")
         if os.path.exists('data.csv'):
-            history_df = pd.read_csv('data.csv')
+            history_df = pd.read_csv('data.csv', parse_dates=True, dayfirst=True)
             total_income = history_df[history_df['Type'] == 'Income']['Amount'].sum()
             total_expense = history_df[history_df['Type'] == 'Expense']['Amount'].sum()
             total_balance = total_income - total_expense
@@ -94,8 +93,9 @@ with col_b2:
             history_df['Amount'] = history_df.apply(lambda row: f'+ {row["Amount"]} {currency}' 
                                     if row['Type'] == 'Income' 
                                     else f'- {row["Amount"]} {currency}', axis=1)
-            st.table(history_df.drop(columns=['Type']))
-
+            #history_df['Month'] = history_df['Date'].dt.strftime("%m")
+            history_container = st.dataframe(history_df.drop(columns='Type'), use_container_width=True)
+                    
         if st.form_submit_button("Clear all data"):
             st.session_state.clear()
             if os.path.exists('data.csv'):
