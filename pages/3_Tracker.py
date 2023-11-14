@@ -38,13 +38,13 @@ with col_b1:
                 }
                                 
                 try:
-                    df = pd.read_csv('data.csv')
+                    history_df = pd.read_csv('data.csv')
                 except (FileNotFoundError, pd.errors.EmptyDataError):
-                    df = pd.DataFrame(columns=user_data.keys())
+                    history_df = pd.DataFrame(columns=user_data.keys())
                                 
-                df = pd.concat([df, pd.DataFrame(user_data, index=[0])], ignore_index=True)
-                df = df.sort_values(by=['Date'], ascending=False)
-                df.to_csv('data.csv', index=False, date_format='%H:%M:%S')
+                history_df = pd.concat([history_df, pd.DataFrame(user_data, index=[0])], ignore_index=True)
+                history_df = history_df.sort_values(by=['Date'], ascending=False)
+                history_df.to_csv('data.csv', index=False, date_format='%H:%M:%S')
 
                 st.success("Data saved!")
 
@@ -64,13 +64,13 @@ with col_b1:
                 }
                                 
                 try:
-                    df = pd.read_csv('data.csv')
+                    history_df = pd.read_csv('data.csv')
                 except (FileNotFoundError, pd.errors.EmptyDataError):
-                    df = pd.DataFrame(columns=user_data.keys())
+                    history_df = pd.DataFrame(columns=user_data.keys())
                             
-                df = pd.concat([df, pd.DataFrame(user_data, index=[0])], ignore_index=True)
-                df = df.sort_values(by=['Date'], ascending=False)
-                df.to_csv('data.csv', index=False, date_format='%H:%M:%S')
+                history_df = pd.concat([history_df, pd.DataFrame(user_data, index=[0])], ignore_index=True)
+                history_df = history_df.sort_values(by=['Date'], ascending=False)
+                history_df.to_csv('data.csv', index=False, date_format='%H:%M:%S')
 
                 st.success("Data saved!")
             
@@ -79,20 +79,20 @@ with col_b2:
     with st.form("transactions_history", clear_on_submit=True):
         st.subheader("History")
         if os.path.exists('data.csv'):
-            df = pd.read_csv('data.csv')
-            total_income = df[df['Type'] == 'Income']['Amount'].sum()
-            total_expense = df[df['Type'] == 'Expense']['Amount'].sum()
+            history_df = pd.read_csv('data.csv')
+            total_income = history_df[history_df['Type'] == 'Income']['Amount'].sum()
+            total_expense = history_df[history_df['Type'] == 'Expense']['Amount'].sum()
             total_balance = total_income - total_expense
         else:
-            df = pd.DataFrame()
+            history_df = pd.DataFrame()
             total_balance = 0
 
-        if not df.empty:
-            df.index = df.index + 1
-            df['Amount'] = df.apply(lambda row: f'+ {row["Amount"]} {currency}' 
+        if not history_df.empty:
+            history_df.index = history_df.index + 1
+            history_df['Amount'] = history_df.apply(lambda row: f'+ {row["Amount"]} {currency}' 
                                     if row['Type'] == 'Income' 
                                     else f'- {row["Amount"]} {currency}', axis=1)
-            st.table(df.drop(columns=['Type']))
+            st.table(history_df.drop(columns=['Type']))
 
         if st.form_submit_button("Clear all data"):
             st.session_state.clear()
