@@ -93,13 +93,15 @@ with col_b2:
             total_balance = 0
             total_saving = 0
 
-        if os.path.exists('budget.csv'):
+        if os.path.exists('budget.csv') and os.path.exists('data.csv'):
             budget_df = pd.read_csv('budget.csv')
             for expense in expenses:
                 budget_expense = budget_df[budget_df['Category'] == category]['Budget'].values[0]
                 expense_cate = history_df[(history_df['Type'] == 'Expense') & (history_df['Category'] == expense)]['Amount'].sum()
                 if (expense_cate > 0.9 * budget_expense).any():
                     st.warning(f"You have spent over 90% of your budget for {expense} category")
+        else:
+            pass
 
         if not history_df.empty:
             history_df.index = history_df.index + 1
