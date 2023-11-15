@@ -114,7 +114,6 @@ with col_b2:
         if st.form_submit_button("Clear all data"):
             st.session_state.clear()
             if os.path.exists('data.csv'):
-                os.remove('budget.csv')
                 os.remove('data.csv')
                 st.success("Data cleared!")
             user_income.clear()
