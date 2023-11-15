@@ -18,14 +18,14 @@ with col1:
             colb_3.write(" ")
             if colb_2.form_submit_button("Add"):
                 try:
-                    budget_df = pd.read_csv('budget_data.csv')
+                    budget_df = pd.read_csv('budget.csv')
                 except (FileNotFoundError, pd.errors.EmptyDataError):
                     budget_df = pd.DataFrame(columns=['Type', 'Category', 'Budget'])
 
                 if not ((budget_df['Type'] == 'Expense') & (budget_df['Category'] == category)).any():
                     budget_data = {'Type': 'Expense', 'Category': category, 'Budget': budget}
                     budget_df = pd.concat([pd.DataFrame([budget_data]), budget_df], ignore_index=True)
-                    budget_df.to_csv('budget_data.csv', index=False)
+                    budget_df.to_csv('budget.csv', index=False)
                     st.success("Data saved!")
                 else:
                     st.warning("Data for this category already exists")
@@ -33,9 +33,9 @@ with col1:
 
             if colb_3.form_submit_button("Update"):
                 try:
-                    budget_df = pd.read_csv('budget_data.csv')
+                    budget_df = pd.read_csv('budget.csv')
                     budget_df.loc[(budget_df['Type'] == 'Expense') & (budget_df['Category'] == category), 'Budget'] = budget
-                    budget_df.to_csv('budget_data.csv', index=False)
+                    budget_df.to_csv('budget.csv', index=False)
                     st.success("Data updated!")
                 except (FileNotFoundError, pd.errors.EmptyDataError):
                     st.warning("No budget data found")
@@ -44,7 +44,7 @@ with col2:
     with st.form("budget", clear_on_submit=True):
         st.subheader("Budget Data")
         try:
-            budget_df = pd.read_csv('budget_data.csv')
+            budget_df = pd.read_csv('budget.csv')
             budget_df.index = budget_df.index + 1
             st.markdown("Expense Budget")
             st.dataframe(budget_df[budget_df['Type'] == 'Expense'])
@@ -53,6 +53,6 @@ with col2:
             st.warning("No budget data found")
         if st.form_submit_button("Clear all data"):
             st.session_state.clear()
-            if os.path.exists('budget_data.csv'):
-                os.remove('budget_data.csv')
+            if os.path.exists('budget.csv'):
+                os.remove('budget.csv')
                 st.success("Data cleared!")
