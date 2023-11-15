@@ -6,7 +6,7 @@ import streamlit as st
 from config import *
 
 # -----------------------------------------
-st.header('Report')
+st.title('Report')
 # side_bar = st.sidebar
 try:
     df = pd.read_csv('data.csv', parse_dates=['Date'], dayfirst=True)
