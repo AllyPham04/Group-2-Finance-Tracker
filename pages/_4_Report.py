@@ -9,7 +9,7 @@ from config import *
 st.header('Report')
 # side_bar = st.sidebar
 try:
-    df = pd.read_csv('data.csv')
+    df = pd.read_csv('data.csv', parse_dates=['Date'], dayfirst=True)
 except (FileNotFoundError, pd.errors.EmptyDataError):
     df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount'])
 # -----------------------------------------
@@ -34,9 +34,7 @@ with range_col:
 
         range_df = df.copy()
         range_df['Date'] = pd.to_datetime(range_df['Date'])
-        range_condition = (range_df['Date'] >= range_manual_start_date) & (
-            range_df['Date'] <= range_manual_end_date)
-        range_df = range_df[range_condition]
+        range_df = range_df[(range_df['Date'] >= range_manual_start_date) & (range_df['Date'] <= range_manual_end_date)]
 
         range_type = st.selectbox(label='Type', 
                                   options=['Income and Expense', 'Categories'])
@@ -72,138 +70,138 @@ with summary_col:
 
     # Write each column
     summary_income.subheader('Total Income')
-    summary_income.metric('', f"{summary_sum_income} {currency}")
+    summary_income.metric('Income', f"{summary_sum_income} {currency}")
     summary_expense.subheader('Total Expense')
-    summary_expense.metric('', f"{summary_sum_expense} {currency}")
+    summary_expense.metric('Expense', f"{summary_sum_expense} {currency}")
     summary_saving.subheader('Total Balance')
-    summary_saving.metric('', f"{summary_sum_saving} {currency}")
+    summary_saving.metric('Balance', f"{summary_sum_saving} {currency}")
 
-visualize_type, temp = st.columns([1, 8])
-if range_type == 'Income and Expense':
-    visual_df = df.groupby(['Date', 'Type'])['Amount'].sum()
-    visual_df = visual_df.reset_index()
-    visualize_type = visualize_type.selectbox('Visualization', 
-                                              ['Line chart', 'Bar chart'])
-elif range_type == 'Categories':
-    visual_df = range_df
-    # visual_df = visual_df.reset_index()
-    # ---------------------------------------------------
-    # De cai o visualization no ngan di
-    visualize_opt, tmp = st.columns([1, 3])
-
-    with visualize_opt:
-        with st.form('visualize_categories', clear_on_submit=False):
-            visualize_type, visualize_cate_type = st.columns(2)
-            visualize_type = visualize_type.selectbox('Visualization type', 
-                                                      ['Line chart', 'Bar chart', 'Pie chart'])
-            visualize_cate_type = visualize_cate_type.selectbox('Type', 
-                                                                ['Income', 'Expense'])
-            visualize_submit = st.form_submit_button('Submit')
-
-visualization, ranking_income, ranking_expense = st.columns([2, 1, 1], gap='medium')
-with visualization:
+if not df.empty:
+    visualize_type, temp = st.columns([1, 8])
     if range_type == 'Income and Expense':
-        if visualize_type == 'Line chart':
-
-            visual = px.line(
-                visual_df,
-                x='Date',
-                y='Amount',
-                color='Type'
-            )
-            st.plotly_chart(visual, use_container_width=True)
-
-        elif visualize_type == 'Bar chart':
-
-            visual = px.bar(
-                visual_df,
-                x='Date',
-                y='Amount',
-                color='Type',
-                barmode="group",
-            )
-            st.plotly_chart(visual, use_container_width=True)
-
-        # ------------------------------------------------------
+        visual_df = df.groupby(['Date', 'Type'])['Amount'].sum()
+        visual_df = visual_df.reset_index()
+        visualize_type = visualize_type.selectbox('Visualization', 
+                                                ['Line chart', 'Bar chart'])
     elif range_type == 'Categories':
-        if visualize_cate_type == 'Income':
-            income_df = visual_df[visual_df['Type'] == 'Income']
-            income_df = income_df.groupby(['Category', 'Date'])[
-                'Amount'].sum().reset_index().sort_values(by='Date')
+        visual_df = range_df
+        # visual_df = visual_df.reset_index()
+        # ---------------------------------------------------
+        # De cai o visualization no ngan di
+        visualize_opt, tmp = st.columns([1, 3])
 
+        with visualize_opt:
+            with st.form('visualize_categories', clear_on_submit=False):
+                visualize_type, visualize_cate_type = st.columns(2)
+                visualize_type = visualize_type.selectbox('Visualization type', 
+                                                        ['Line chart', 'Bar chart', 'Pie chart'])
+                visualize_cate_type = visualize_cate_type.selectbox('Type', 
+                                                                    ['Income', 'Expense'])
+                visualize_submit = st.form_submit_button('Submit')
+
+    visualization, ranking_income, ranking_expense = st.columns([2, 1, 1], gap='medium')
+    with visualization:
+        if range_type == 'Income and Expense':
             if visualize_type == 'Line chart':
 
                 visual = px.line(
-                    income_df,
+                    visual_df,
                     x='Date',
                     y='Amount',
-                    color='Category'
+                    color='Type'
                 )
                 st.plotly_chart(visual, use_container_width=True)
 
             elif visualize_type == 'Bar chart':
 
                 visual = px.bar(
-                    income_df,
+                    visual_df,
                     x='Date',
                     y='Amount',
-                    color='Category',
-                    barmode="stack",
+                    color='Type',
+                    barmode="group",
                 )
                 st.plotly_chart(visual, use_container_width=True)
 
-            elif visualize_type == "Pie chart":
+            # ------------------------------------------------------
+        elif range_type == 'Categories':
+            if visualize_cate_type == 'Income':
+                income_df = visual_df[visual_df['Type'] == 'Income']
+                income_df = income_df.groupby(['Category', 'Date'])['Amount'].sum().reset_index().sort_values(by='Date')
 
-                visual = px.pie(
-                    income_df,
-                    values='Amount',
-                    names='Category'
-                )
-                st.plotly_chart(visual, use_container_width=True)
+                if visualize_type == 'Line chart':
 
-        elif visualize_cate_type == 'Expense':
-            expense_df = visual_df[visual_df['Type'] == 'Expense']
-            expense_df = expense_df.groupby(['Category', 'Date'])[
-                'Amount'].sum().reset_index().sort_values(by='Date')
+                    visual = px.line(
+                        income_df,
+                        x='Date',
+                        y='Amount',
+                        color='Category'
+                    )
+                    st.plotly_chart(visual, use_container_width=True)
 
-            if visualize_type == 'Line chart':
+                elif visualize_type == 'Bar chart':
 
-                visual = px.line(
-                    expense_df,
-                    x='Date',
-                    y='Amount',
-                    color='Category'
-                )
-                st.plotly_chart(visual, use_container_width=True)
+                    visual = px.bar(
+                        income_df,
+                        x='Date',
+                        y='Amount',
+                        color='Category',
+                        barmode="stack",
+                    )
+                    st.plotly_chart(visual, use_container_width=True)
 
-            elif visualize_type == 'Bar chart':
+                elif visualize_type == "Pie chart":
 
-                visual = px.bar(
-                    expense_df,
-                    x='Date',
-                    y='Amount',
-                    color='Category',
-                    barmode="stack",
-                )
-                st.plotly_chart(visual, use_container_width=True)
+                    visual = px.pie(
+                        income_df,
+                        values='Amount',
+                        names='Category'
+                    )
+                    st.plotly_chart(visual, use_container_width=True)
 
-            elif visualize_type == "Pie chart":
+            elif visualize_cate_type == 'Expense':
+                expense_df = visual_df[visual_df['Type'] == 'Expense']
+                expense_df = expense_df.groupby(['Category', 'Date'])[
+                    'Amount'].sum().reset_index().sort_values(by='Date')
 
-                visual = px.pie(
-                    expense_df,
-                    values='Amount',
-                    names='Category'
-                )
-                st.plotly_chart(visual, use_container_width=True)
+                if visualize_type == 'Line chart':
 
-with ranking_income:
-    ranking_income.header('Income')
-    rank_income_df = df[df['Type'] == 'Income'].copy()
-    rank_income_df = rank_income_df.groupby(['Category'])['Amount'].sum()
-    st.dataframe(rank_income_df.head(5))
+                    visual = px.line(
+                        expense_df,
+                        x='Date',
+                        y='Amount',
+                        color='Category'
+                    )
+                    st.plotly_chart(visual, use_container_width=True)
 
-with ranking_expense:
-    ranking_expense.header('Expense')
-    rank_expense_df = df[df['Type'] == 'Expense'].copy()
-    rank_expense_df = rank_expense_df.groupby(['Category'])['Amount'].sum()
-    st.dataframe(rank_expense_df.head(5))
+                elif visualize_type == 'Bar chart':
+
+                    visual = px.bar(
+                        expense_df,
+                        x='Date',
+                        y='Amount',
+                        color='Category',
+                        barmode="stack",
+                    )
+                    st.plotly_chart(visual, use_container_width=True)
+
+                elif visualize_type == "Pie chart":
+
+                    visual = px.pie(
+                        expense_df,
+                        values='Amount',
+                        names='Category'
+                    )
+                    st.plotly_chart(visual, use_container_width=True)
+
+    with ranking_income:
+        ranking_income.header('Income')
+        rank_income_df = df[df['Type'] == 'Income'].copy()
+        rank_income_df = rank_income_df.groupby(['Category'])['Amount'].sum()
+        st.dataframe(rank_income_df.head(5))
+
+    with ranking_expense:
+        ranking_expense.header('Expense')
+        rank_expense_df = df[df['Type'] == 'Expense'].copy()
+        rank_expense_df = rank_expense_df.groupby(['Category'])['Amount'].sum()
+        st.dataframe(rank_expense_df.head(5))
