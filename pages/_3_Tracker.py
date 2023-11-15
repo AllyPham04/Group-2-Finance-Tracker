@@ -15,11 +15,6 @@ now = datetime.now()
 total_income = 0
 total_expense = 0
 
-def get_budget_for_category(category):
-    budget_df = pd.read_csv('budget_data.csv')
-    budget = budget_df[budget_df['Category'] == category]['Budget']
-    return budget
-
 if 'previous_total_balance' not in st.session_state:
     st.session_state['previous_total_balance'] = 0
 
@@ -45,10 +40,10 @@ with col_b1:
                                 
                 try:
                     history_df = pd.read_csv('data.csv')
-                    budget_df = pd.read_csv('budget_data.csv')
+                    #budget_df = pd.read_csv('budget.csv')
                 except (FileNotFoundError, pd.errors.EmptyDataError):
                     history_df = pd.DataFrame(columns=user_data.keys())
-                    budget_df = pd.DataFrame(columns=['Type', 'Category', 'Budget'])
+                    #budget_df = pd.DataFrame(columns=['Type', 'Category', 'Budget'])
                                 
                 history_df = pd.concat([pd.DataFrame(user_data, index=[0]), history_df], ignore_index=True)
                 history_df['Date'] = pd.to_datetime(history_df['Date'], format="%d-%m-%Y")
@@ -83,8 +78,7 @@ with col_b1:
                 history_df.to_csv('data.csv', index=False, date_format="%d-%m-%Y")
 
                 st.success("Data saved!")
-            
-    
+
 with col_b2:
     with st.form("transactions_history", clear_on_submit=True):
         st.subheader("History")
@@ -94,16 +88,18 @@ with col_b2:
             total_expense = history_df[history_df['Type'] == 'Expense']['Amount'].sum()
             total_balance = total_income - total_expense
             total_saving = history_df[(history_df['Type'] == 'Income') & (history_df['Category'] == 'Saving')]['Amount'].sum()
-            budget_df = pd.read_csv('budget_data.csv')
-            for expense in expenses:
-                budget_expense = get_budget_for_category(expense)
-                expense_cate = history_df[(history_df['Type'] == 'Expense') & (history_df['Category'] == expense)]['Amount'].sum()
-                if (expense_cate > 0.9 * budget_expense).any():
-                    st.warning(f"You have spent over 90% of your budget for {expense} category")
         else:
             history_df = pd.DataFrame()
             total_balance = 0
             total_saving = 0
+
+        if os.path.exists('budget.csv'):
+            budget_df = pd.read_csv('budget.csv')
+            for expense in expenses:
+                budget_expense = budget_df[budget_df['Category'] == category]['Budget'].values[0]
+                expense_cate = history_df[(history_df['Type'] == 'Expense') & (history_df['Category'] == expense)]['Amount'].sum()
+                if (expense_cate > 0.9 * budget_expense).any():
+                    st.warning(f"You have spent over 90% of your budget for {expense} category")
 
         if not history_df.empty:
             history_df.index = history_df.index + 1
