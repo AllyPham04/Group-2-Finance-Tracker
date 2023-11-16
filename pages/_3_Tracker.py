@@ -6,6 +6,7 @@ from config import *
 from datetime import datetime
 from millify import millify
 
+st.set_page_config(layout=layout)
 st.title("Tracker")
 col_a1, col_a2, col_a3 = st.columns([0.2, 0.4, 0.4])
 #st.divider()
@@ -80,6 +81,9 @@ with col_b1:
                 st.success("Data saved!")
 
 with col_b2:
+    st.write('')
+    st.write('')
+    st.write('')
     with st.form("transactions_history", clear_on_submit=True):
         st.subheader("History")
         if os.path.exists('data.csv'):
@@ -93,17 +97,8 @@ with col_b2:
             total_balance = 0
             total_saving = 0
 
-        if os.path.exists('budget.csv') and os.path.exists('data.csv'):
-            budget_df = pd.read_csv('budget.csv')
-            for expense in expenses:
-                budget_expense = budget_df[budget_df['Category'] == category]['Budget'].values[0]
-                expense_cate = history_df[(history_df['Type'] == 'Expense') & (history_df['Category'] == expense)]['Amount'].sum()
-                if (expense_cate > 0.9 * budget_expense).any():
-                    st.warning(f"You have spent over 90% of your budget for {expense} category")
-        else:
-            pass
-
         if not history_df.empty:
+            copyhistory_df = history_df.copy()
             history_df.index = history_df.index + 1
             history_df['Amount'] = history_df.apply(lambda row: f'+ {row["Amount"]} {currency}' 
                                     if row['Type'] == 'Income' 
@@ -111,6 +106,19 @@ with col_b2:
             #history_df['Month'] = history_df['Date'].dt.strftime("%m")
             history_container = st.dataframe(history_df.drop(columns='Type'), use_container_width=True)
         
+        
+        if os.path.exists('budget.csv') and os.path.exists('data.csv'):
+            budget_df = pd.read_csv('budget.csv')
+            for expense in expenses:
+                budget_expense = float(budget_df[budget_df['Category'] == category]['Budget'].values[0])
+                expense_cate = float(copyhistory_df[(copyhistory_df['Type'] == 'Expense') & (copyhistory_df['Category'] == expense)]['Amount'].sum())
+                if expense_cate > 0.9 * budget_expense:
+                    if not st.session_state.get(f'warning_{expense}', False):
+                        st.warning(f"You have spent over 90% of your budget for {expense} category")
+                        st.session_state[f'warning_{expense}'] = True
+        else:
+            pass
+
         if st.form_submit_button("Clear all data"):
             st.session_state.clear()
             if os.path.exists('data.csv'):
