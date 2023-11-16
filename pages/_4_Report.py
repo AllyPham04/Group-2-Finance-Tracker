@@ -6,6 +6,7 @@ import streamlit as st
 from config import *
 
 # -----------------------------------------
+st.set_page_config(layout=layout)
 st.title('Report')
 # side_bar = st.sidebar
 try:
