@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import os
 
+st.set_page_config(layout=layout)
 st.title("Set Budget ")
 
 col1, col2 = st.columns([5, 5])
