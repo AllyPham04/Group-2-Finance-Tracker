@@ -1,9 +1,10 @@
-import datetime as dt
 import os
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+import pytz
 from config import *
+from datetime import datetime
 
 # -----------------------------------------
 st.set_page_config(layout=layout)
@@ -19,6 +20,9 @@ range_col, summary_col = st.columns([1, 2], gap='medium')
 # range_col.title("COL 1")
 # summary_col.title("COL 2")
 
+now = datetime.now()
+now_vn = now.astimezone(pytz.timezone('Asia/Ho_Chi_Minh'))
+
 with range_col:
     # range_col_manual_select, range_col_quick_select = st.tabs(['Manual Selection', 'Quick Selection'])
     #
@@ -26,8 +30,8 @@ with range_col:
     with st.form('range_form', clear_on_submit=False):
 
         range_manual_start_date_input, range_manual_end_date_input = st.columns(2)
-        range_manual_start_date_input = range_manual_start_date_input.date_input('From')
-        range_manual_end_date_input = range_manual_end_date_input.date_input('To')
+        range_manual_start_date_input = range_manual_start_date_input.date_input('From', value=now_vn.date(), format="DD/MM/YYYY")
+        range_manual_end_date_input = range_manual_end_date_input.date_input('To', value=now_vn.date(), format="DD/MM/YYYY")
         range_manual_start_date = pd.to_datetime(
             range_manual_start_date_input, format='%Y-%m-%d')
         range_manual_end_date = pd.to_datetime(
