@@ -50,3 +50,4 @@ with display_r[3]:
     with st.container():
         st.subheader("Total Saving") 
         st.metric('Saving', f"{total_saving_millified} {currency}")
+display[0].divider()
