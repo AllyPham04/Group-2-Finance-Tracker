@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import pandas as pd
 import plotly.express as px
+import pytz
 from config import *
 from datetime import datetime
 from millify import millify
@@ -11,7 +12,9 @@ st.title("Tracker")
 col_a1, col_a2, col_a3 = st.columns([0.2, 0.4, 0.4])
 #st.divider()
 col_b1, col_b2 = st.columns(2)
+
 now = datetime.now()
+now_vn = now.astimezone(pytz.timezone('Asia/Ho_Chi_Minh'))
 
 total_income = 0
 total_expense = 0
@@ -27,7 +30,7 @@ with col_b1:
     with tab1:
         with st.form("income", clear_on_submit=True):
             st.subheader("Transaction")
-            selected_date = st.date_input("Select date:", value=datetime.today(), format="DD/MM/YYYY")
+            selected_date = st.date_input("Select date:", value=now_vn.date(), format="DD/MM/YYYY")
             amount = st.number_input(f"Amount:", min_value=0, format="%i", step=10)
             category = st.selectbox("Category:", incomes)
             if st.form_submit_button("Save Data"):
@@ -56,7 +59,7 @@ with col_b1:
     with tab2:
         with st.form("expense", clear_on_submit=True):
             st.subheader("Transaction")
-            selected_date = st.date_input("Select date:", value=datetime.today(), format="DD/MM/YYYY")
+            selected_date = st.date_input("Select date:", value=now_vn.date(), format="DD/MM/YYYY")
             amount = st.number_input(f"Amount:", min_value=0, format="%i", step=10)
             category = st.selectbox("Category:", expenses)
             if st.form_submit_button("Save Data"):
