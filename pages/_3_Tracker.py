@@ -9,7 +9,7 @@ from millify import millify
 
 st.set_page_config(layout=layout)
 st.title("Tracker")
-col_a1, col_a2, col_a3 = st.columns([0.2, 0.4, 0.4])
+col_a1, col_a2 = st.columns([0.2, 0.8])
 #st.divider()
 col_b1, col_b2 = st.columns(2)
 
@@ -160,7 +160,3 @@ with col_a2:
                             names=["Saving", "Remaning"], 
                             title=f'Saving Progress')
             col_a2_2.plotly_chart(fig_saving, use_container_width=True)
-
-with col_a3:
-    pass
-    #code ở đây
