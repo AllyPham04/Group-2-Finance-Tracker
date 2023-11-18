@@ -6,7 +6,7 @@ import os
 st.set_page_config(layout=layout)
 st.title("Set Budget ")
 
-col1, col2 = st.columns([5, 5])
+col1, col2 = st.columns(2, gap="large")
 with col1:
     st.subheader("Set Budget")
     for category in expenses:
