@@ -70,6 +70,9 @@ if 'weekly_data' not in st.session_state:
     weekly_data = st.session_state['weekly_data']
 displayr2 = display[0].columns([2, 1])
 with displayr2[0]:
+    st.write('')
+    st.write('')
+    st.write('')
     with st.container():
         st.subheader("Weekly Chart")
         
@@ -100,17 +103,29 @@ with displayr2[0]:
 
 with displayr2[1]:
     with st.container():
-        st.subheader("All Expenses")
+        all_income, all_expenses = st.tabs(["Income", "Expense"])
+        with all_expenses:
+            st.subheader("All Expense")
 
-        date_range = pd.date_range(start=st.session_state['start_date'], periods=6)
-        
-        weekly_expenses = weekly_data[weekly_data['Type'] == 'Expense']
-        
-        #all_days_data = pd.DataFrame({'Date': date_range})
-        if not weekly_expenses.empty:
-            expenses_by_category = weekly_expenses.groupby('Category')['Amount'].sum().reset_index()
+            weekly_expenses = weekly_data[weekly_data['Type'] == 'Expense']
+            
+            #all_days_data = pd.DataFrame({'Date': date_range})
+            if not weekly_expenses.empty:
+                expenses_by_category = weekly_expenses.groupby('Category')['Amount'].sum().reset_index()
 
-            visual_pie = px.pie(expenses_by_category, values='Amount', names='Category', hole=0.5)
-            st.plotly_chart(visual_pie, use_container_width=True)
-        else:
-            st.warning("No expense data available for the selected week.")
+                visual_pie = px.pie(expenses_by_category, values='Amount', names='Category', hole=0.5)
+                st.plotly_chart(visual_pie, use_container_width=True)
+            else:
+                st.warning("No expense data available for the selected week.")
+        
+        with all_income:
+            st.subheader("All Income")
+            weekly_income = weekly_data[weekly_data['Type'] == 'Income']
+
+            if not weekly_income.empty:
+                income_by_category = weekly_income.groupby('Category')['Amount'].sum().reset_index()
+
+                visual_pie = px.pie(income_by_category, values='Amount', names='Category', hole=0.5)
+                st.plotly_chart(visual_pie, use_container_width=True)
+            else:
+                st.warning("No income data available for the selected week.")
