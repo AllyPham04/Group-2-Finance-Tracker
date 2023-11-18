@@ -3,17 +3,25 @@ import os
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-import _1_Home
-import config
+import pytz
+from config import *
+from datetime import datetime
+
+st.set_page_config(layout=layout)
+st.title('Report')
 # -----------------------------------------
 ss = st.session_state
-file_path = 'data.csv'
-df = pd.read_csv(file_path)
+# side_bar = st.sidebar
+try:
+    file_path = 'data.csv'
+    df = pd.read_csv(file_path, parse_dates=['Date'], dayfirst=True)
+except (FileNotFoundError, pd.errors.EmptyDataError):
+    df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount'])
 # -----------------------------------------
 
-# range_col.title("COL 1")
+now = datetime.now()
+now_vn = now.astimezone(pytz.timezone('Asia/Ho_Chi_Minh'))
 
-    # summary_col.title("COL 2")
 def summarize(summary_df):
 # Set name which divided into 3 columns
     summary_income, summary_expense, summary_saving = st.columns(3)
@@ -22,11 +30,10 @@ def summarize(summary_df):
     summary_sum = summary_df.groupby(['Type'])['Amount'].sum()
     summary_sum_income = summary_sum.get('Income', 0)
     summary_sum_expense = summary_sum.get('Expense', 0)
-    summary_sum_saving = summary_sum.get(
-        'Income', 0) - summary_sum.get('Expense', 0)
-    summary_income.subheader('Total income')
+    summary_sum_saving = summary_sum.get('Income', 0) - summary_sum.get('Expense', 0)
 
     # Write each column
+    summary_income.subheader('Total Income')
     summary_income.subheader(f"{summary_sum_income:,}")
     summary_expense.subheader('Total Expense')
     summary_expense.subheader(f"{summary_sum_expense:,}")
@@ -39,22 +46,22 @@ with range_col_manual_select:
 
     with st.form('range_form', clear_on_submit=False):
 
-        range_manual_start_date_input, range_manual_end_date_input, tmp = st.columns([.25,.25,.5])
-        range_manual_start_date_input = range_manual_start_date_input.date_input('From')
-        range_manual_end_date_input = range_manual_end_date_input.date_input('To')
+        range_manual_start_date_input, range_manual_end_date_input = st.columns(2)
+        range_manual_start_date_input = range_manual_start_date_input.date_input('From', value=now_vn.date(), format="DD/MM/YYYY")
+        range_manual_end_date_input = range_manual_end_date_input.date_input('To', value=now_vn.date(), format="DD/MM/YYYY")
         range_manual_start_date = pd.to_datetime(
-            range_manual_start_date_input, format='%d-%m-%Y')
+            range_manual_start_date_input, format='%Y-%m-%d')
         range_manual_end_date = pd.to_datetime(
-            range_manual_end_date_input, format='%d-%m-%Y')
-        #
+            range_manual_end_date_input, format='%Y-%m-%d')
+
         range_df = df.copy()
         range_df['Date'] = pd.to_datetime(range_df['Date'])
-        range_condition = (range_df['Date'] >= range_manual_start_date) & (range_df['Date'] <= range_manual_end_date)
-        range_df = range_df[range_condition]
-        range_type, tmp = st.columns(2)
-        range_type = range_type.selectbox(label='Type', options=['Income and Expense', 'Categories'])
+        range_df = range_df[(range_df['Date'] >= range_manual_start_date) & (range_df['Date'] <= range_manual_end_date)]
 
-        range_button = st.form_submit_button(label='Submit')
+        range_type = st.selectbox(label='Type', 
+                                  options=['Income and Expense', 'Categories'])
+
+        range_button = st.form_submit_button('Submit')
     options, summary = st.columns(2, gap='large')
     with options:
         if range_type == 'Income and Expense':
@@ -72,10 +79,9 @@ with range_col_manual_select:
                 visualize_type = visualize_type.selectbox('Visualization type', ['Line chart', 'Bar chart', 'Pie chart'])
                 visualize_cate_type = visualize_cate_type.selectbox('Type', ['Income', 'Expense'])
                 visualize_submit = st.form_submit_button('Submit')
+
     with summary:
         summarize(range_df)
-
-
     visualization = st.container()
     with visualization:
         if range_type == 'Income and Expense':
@@ -104,8 +110,7 @@ with range_col_manual_select:
         elif range_type == 'Categories':
             if visualize_cate_type == 'Income':
                 income_df = visual_df[visual_df['Type'] == 'Income']
-                income_df = income_df.groupby(['Category', 'Date'])['Amount'].sum().reset_index().sort_values(
-                    by='Date')
+                income_df = income_df.groupby(['Category', 'Date'])['Amount'].sum().reset_index().sort_values(by='Date')
 
                 if visualize_type == 'Line chart':
 
@@ -176,8 +181,8 @@ with range_col_quick_select:
     quick_select, tmp = st.columns([1,4])
     quick_select = quick_select.selectbox('By',['Week', 'Month', 'Year'])
 
-    weekdays = ['Monday', 'Monday', 'Tuesday', 'Tuesday', 'Wednesday', 'Wednesday', 'Thursday',
-                'Thursday', 'Friday', 'Friday', 'Saturday', 'Saturday', 'Sunday', 'Sunday']
+    # weekdays = ['Monday', 'Monday', 'Tuesday', 'Tuesday', 'Wednesday', 'Wednesday', 'Thursday',
+    #             'Thursday', 'Friday', 'Friday', 'Saturday', 'Saturday', 'Sunday', 'Sunday']
 
     today = dt.date.today()
 
@@ -228,6 +233,7 @@ with range_col_quick_select:
             visual_df = visual_df[(visual_df['Type'] != 0) | (visual_df['Amount'] != 0)]
             visualize_type, tmp = st.columns(2)
             visualize_type = visualize_type.selectbox('Charts', ['Line chart', 'Bar chart'])
+            visual_df['Weekdays'] = visual_df['Date'].dt.strftime('%A')
 
     with summary:
         summarize(range_quick_df)
@@ -239,7 +245,7 @@ with range_col_quick_select:
 
                 visual = px.line(
                     visual_df,
-                    x=weekdays,
+                    x='Weekdays',
                     y='Amount',
                     color='Type'
                 )
@@ -249,7 +255,7 @@ with range_col_quick_select:
 
                 visual = px.bar(
                     visual_df,
-                    x=weekdays,
+                    x='Weekdays',
                     y='Amount',
                     color='Type',
                     barmode="stack",
@@ -272,5 +278,3 @@ with rank_expense:
     rank_expense_df = rank_expense_df.groupby('Category')['Amount'].sum()
     # rank_expense_df = rank_expense_df.sort_values('Amount', ascending=False)
     st.dataframe(rank_expense_df)
-
-
