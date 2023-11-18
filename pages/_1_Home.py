@@ -65,33 +65,38 @@ if 'start_date' not in st.session_state:
     st.session_state['start_date'] = current_date - timedelta(days=(current_date.weekday() - 0) % 7)
     st.session_state['start_date'] = st.session_state['start_date'].date()
 
+if 'weekly_data' not in st.session_state:
+    st.session_state['weekly_data'] = pd.DataFrame()
+    weekly_data = st.session_state['weekly_data']
 displayr2 = display[0].columns([2, 1])
 with displayr2[0]:
     with st.container():
         st.subheader("Weekly Chart")
         
-        date_range = pd.date_range(start=st.session_state['start_date'], periods=6)
         if button_left:
             st.session_state['start_date'] += timedelta(weeks=1)
         
         if button_right:
             st.session_state['start_date'] -= timedelta(weeks=1)
-        
+
+        date_range = pd.date_range(start=st.session_state['start_date'], periods=7)
         weekly_data = df[(df['Date'] >= st.session_state['start_date']) & (df['Date'] < st.session_state['start_date'] + timedelta(weeks=1))]
         
-        #all_days_data = pd.DataFrame({'Date': date_range})
-        if not weekly_data.empty:
-            df_resampled = weekly_data.groupby(['Date', 'Type'])['Amount'].sum()
-            df_resampled = df_resampled.reset_index()
-            df_resampled['Type'] = pd.Categorical(df_resampled['Type'], categories=['Income', 'Expense'], ordered=True)
-            #df_resampled = pd.merge(all_days_data, df_resampled, on='Date')
-            #df_resampled['Amount'].fillna(0, inplace=True)
+        all_days_data = pd.DataFrame({'Date': date_range})
+        all_days_data['Date'] = pd.to_datetime(all_days_data['Date']).dt.date
 
-            visual_bar = px.bar(df_resampled, x="Date", y="Amount", color="Type", barmode="group")
-            st.plotly_chart(visual_bar, use_container_width=True)
+        df_resampled = weekly_data.groupby(['Date', 'Type'])['Amount'].sum()
+        df_resampled = df_resampled.reset_index()
+        df_resampled['Type'] = pd.Categorical(df_resampled['Type'], categories=['Income', 'Expense'], ordered=True)
             
-        else:
-            st.warning("No data available for the selected week.")
+        all_days_data = pd.MultiIndex.from_product([all_days_data['Date'], ['Income', 'Expense']], names=['Date', 'Type']).to_frame(index=False)
+        
+        df_resampled = pd.merge(all_days_data, df_resampled, on=['Date', 'Type'], how='left', sort=True)
+
+        df_resampled['Amount'].fillna(0, inplace=True)
+
+        visual_bar = px.bar(df_resampled, x="Date", y="Amount", color="Type", barmode="group")
+        st.plotly_chart(visual_bar, use_container_width=True)
 
 with displayr2[1]:
     with st.container():
