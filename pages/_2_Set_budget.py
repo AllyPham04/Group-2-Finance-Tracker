@@ -42,18 +42,20 @@ with col1:
                     st.warning("No budget data found")
 
 with col2:
-    with st.form("budget", clear_on_submit=True):
+    with st.container():
         st.subheader("Budget Data")
         try:
             budget_df = pd.read_csv('budget.csv')
             budget_df.index = budget_df.index + 1
-            st.markdown("Expense Budget")
             st.dataframe(budget_df[budget_df['Type'] == 'Expense'])
         except (FileNotFoundError, pd.errors.EmptyDataError):
             budget_df = pd.DataFrame(columns=['Type', 'Category', 'Budget'])
             st.warning("No budget data found")
-        if st.form_submit_button("Clear all data"):
+
+        clear_data = st.button("Clear All Data")
+
+        if clear_data:
             st.session_state.clear()
-            if os.path.exists('budget.csv'):
-                os.remove('budget.csv')
-                st.success("Data cleared!")
+            if os.path.exists("budget.csv"):
+                os.remove("budget.csv")
+                st.success("All data cleared!")
