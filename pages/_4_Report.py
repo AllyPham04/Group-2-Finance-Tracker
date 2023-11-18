@@ -203,10 +203,10 @@ if not df.empty:
         ranking_income.header('Income')
         rank_income_df = df[df['Type'] == 'Income'].copy()
         rank_income_df = rank_income_df.groupby(['Category'])['Amount'].sum()
-        st.dataframe(rank_income_df.head(5))
+        st.dataframe(rank_income_df.head(5), use_container_width=True)
 
     with ranking_expense:
         ranking_expense.header('Expense')
         rank_expense_df = df[df['Type'] == 'Expense'].copy()
         rank_expense_df = rank_expense_df.groupby(['Category'])['Amount'].sum()
-        st.dataframe(rank_expense_df.head(5))
+        st.dataframe(rank_expense_df.head(5), use_container_width=True)
