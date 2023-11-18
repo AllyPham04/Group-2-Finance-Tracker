@@ -113,12 +113,13 @@ with col_b2:
         if os.path.exists('budget.csv') and os.path.exists('data.csv'):
             budget_df = pd.read_csv('budget.csv')
             for expense in expenses:
-                budget_expense = float(budget_df[budget_df['Category'] == category]['Budget'].values[0])
-                expense_cate = float(copyhistory_df[(copyhistory_df['Type'] == 'Expense') & (copyhistory_df['Category'] == expense)]['Amount'].sum())
-                if expense_cate > 0.9 * budget_expense:
-                    if not st.session_state.get(f'warning_{expense}', False):
-                        st.warning(f"You have spent over 90% of your budget for {expense} category")
-                        st.session_state[f'warning_{expense}'] = True
+                if expense in budget_df['Category'].values:
+                    budget_expense = float(budget_df[budget_df['Category'] == expense]['Budget'].values[0])
+                    expense_cate = float(copyhistory_df[(copyhistory_df['Type'] == 'Expense') & (copyhistory_df['Category'] == expense)]['Amount'].sum())
+                    if expense_cate > 0.9 * budget_expense:
+                        if not st.session_state.get(f'warning_{expense}', False):
+                            st.warning(f"You have spent over 90% of your budget for {expense} category")
+                            st.session_state[f'warning_{expense}'] = True
         else:
             pass
 
