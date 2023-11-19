@@ -278,3 +278,7 @@ with rank_expense:
     rank_expense_df = rank_expense_df.groupby('Category')['Amount'].sum()
     # rank_expense_df = rank_expense_df.sort_values('Amount', ascending=False)
     st.dataframe(rank_expense_df)
+
+
+########################
+
