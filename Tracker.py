@@ -97,7 +97,6 @@ def track():
             st.subheader("History")
             if os.path.exists('data.csv'):
                 history_df = pd.read_csv('data.csv', parse_dates=True, dayfirst=True)
-                history_df['Date'] = pd.to_datetime(history_df['Date']).dt.date
                 total_income = history_df[history_df['Type'] == 'Income']['Amount'].sum()
                 total_expense = history_df[history_df['Type'] == 'Expense']['Amount'].sum()
                 total_balance = total_income - total_expense
@@ -109,7 +108,8 @@ def track():
 
             if not history_df.empty:
                 monthly_df = history_df.copy() #monthly_data
-                monthly_df = history_df[(history_df['Date'] >= first_day_of_month) & (history_df['Date'] <= last_day_of_month)]
+                monthly_df['Date'] = pd.to_datetime(monthly_df['Date'], dayfirst=True).dt.date
+                monthly_df = monthly_df[(monthly_df['Date'] >= first_day_of_month) & (monthly_df['Date'] <= last_day_of_month)]
                 history_df.index = history_df.index + 1
                 history_df['Amount'] = history_df.apply(lambda row: f'+ {currency} {row["Amount"]}' 
                                         if row['Type'] == 'Income' 
