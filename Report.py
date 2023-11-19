@@ -35,11 +35,11 @@ def rep():
 
         # Write each column
         summary_income.subheader('Total Income')
-        summary_income.subheader(f"{summary_sum_income:,}")
+        summary_income.subheader(f"{currency} {summary_sum_income:,}")
         summary_expense.subheader('Total Expense')
-        summary_expense.subheader(f"{summary_sum_expense:,}")
+        summary_expense.subheader(f"{currency} {summary_sum_expense:,}")
         summary_saving.subheader('Balance')
-        summary_saving.subheader(f"{summary_sum_saving:,}")
+        summary_saving.subheader(f"{currency} {summary_sum_saving:,}")
 
 
     range_col_manual_select, range_col_quick_select = st.tabs(['Manual Selection', 'Quick Selection'])
@@ -180,7 +180,7 @@ def rep():
 
     with range_col_quick_select:
         quick_select, tmp = st.columns([1,4])
-        quick_select = quick_select.selectbox('By',['Week', 'Month', 'Year'])
+        quick_select = quick_select.selectbox('By',['Week'])
 
         # weekdays = ['Monday', 'Monday', 'Tuesday', 'Tuesday', 'Wednesday', 'Wednesday', 'Thursday',
         #             'Thursday', 'Friday', 'Friday', 'Saturday', 'Saturday', 'Sunday', 'Sunday']
