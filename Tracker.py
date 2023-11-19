@@ -18,9 +18,9 @@ def track():
     now = datetime.now()
     now_vn = now.astimezone(pytz.timezone('Asia/Ho_Chi_Minh'))
 
-    _, last_day = calendar.monthrange(now.year, now.month)
-    first_day_of_month = datetime(now.year, now.month, 1).date()
-    last_day_of_month = datetime(now.year, now.month, last_day).date()
+    _, last_day = calendar.monthrange(now_vn.year, now_vn.month)
+    first_day_of_month = datetime(now_vn.year, now_vn.month, 1).date()
+    last_day_of_month = datetime(now_vn.year, now_vn.month, last_day).date()
 
     total_income = 0
     total_expense = 0
@@ -126,7 +126,7 @@ def track():
                         expense_cate = float(monthly_df[(monthly_df['Type'] == 'Expense') & (monthly_df['Category'] == expense)]['Amount'].sum())
                         if expense_cate > 0.9 * budget_expense:
                             if not st.session_state.get(f'warning_{expense}', False):
-                                st.warning(f"You have spent over 90% of your budget for {expense} category in {calendar.month_name[now.month]}")
+                                st.warning(f"You have spent over 90% of your budget for {expense} category in {calendar.month_name[now_vn.month]}")
                                 st.session_state[f'warning_{expense}'] = True
             else:
                 pass
