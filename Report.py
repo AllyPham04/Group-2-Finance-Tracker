@@ -265,18 +265,35 @@ def rep():
                     st.plotly_chart(visual, use_container_width=True)
 
                 # ------------------------------------------------------
-    rank_income, rank_expense, tmp = st.columns([1,1,2])
+    with range_col_manual_select:
+        rank_income, rank_expense, tmp = st.columns([1,1,2])
+        with rank_income:
+            st.header('Top Income')
+            rank_income_df = range_df[range_df['Type'] == 'Income'].copy()
+            rank_income_df = rank_income_df.groupby(['Category'])['Amount'].sum()
+            # rank_income_df = rank_income_df.sort_values('Amount', ascending=False)
+            st.dataframe(rank_income_df)
 
-    with rank_income:
-        st.header('Top Income')
-        rank_income_df = df[df['Type'] == 'Income'].copy()
-        rank_income_df = rank_income_df.groupby(['Category'])['Amount'].sum()
-        # rank_income_df = rank_income_df.sort_values('Amount', ascending=False)
-        st.dataframe(rank_income_df)
+        with rank_expense:
+            st.header('Top Expense')
+            rank_expense_df = range_df[range_df['Type'] == 'Expense'].copy()
+            rank_expense_df = rank_expense_df.groupby('Category')['Amount'].sum()
+            # rank_expense_df = rank_expense_df.sort_values('Amount', ascending=False)
+            st.dataframe(rank_expense_df)
+    
+    with range_col_quick_select:
+        quick = st.columns([1, 1, 2])
+        with quick[0]:
+            st.header('Top Income')
+            top_income_df = range_quick_df[range_quick_df['Type'] == 'Income'].copy()
+            top_income_df = top_income_df.groupby(['Category'])['Amount'].sum()
 
-    with rank_expense:
-        st.header('Top Expense')
-        rank_expense_df = df[df['Type'] == 'Expense'].copy()
-        rank_expense_df = rank_expense_df.groupby('Category')['Amount'].sum()
-        # rank_expense_df = rank_expense_df.sort_values('Amount', ascending=False)
-        st.dataframe(rank_expense_df)
+            st.dataframe(top_income_df)
+        
+        with quick[1]:
+            st.header('Top Expense')
+            top_expense_df = range_quick_df[range_quick_df['Type'] == 'Expense'].copy()
+            top_expense_df = top_expense_df.groupby('Category')['Amount'].sum()
+
+            st.dataframe(top_expense_df)
+        
