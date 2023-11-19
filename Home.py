@@ -77,6 +77,7 @@ def home():
         with st.container():
             st.subheader("Weekly Chart")
             
+            home_chart = st.selectbox('Chart', ['Bar Chart', 'Line Chart'])
             if button_left:
                 st.session_state['start_date'] += timedelta(weeks=1)
             
@@ -98,9 +99,14 @@ def home():
             df_resampled = pd.merge(all_days_data, df_resampled, on=['Date', 'Type'], how='left', sort=True)
 
             df_resampled['Amount'].fillna(0, inplace=True)
-
-            visual_bar = px.bar(df_resampled, x="Date", y="Amount", color="Type", barmode="group")
-            st.plotly_chart(visual_bar, use_container_width=True)
+            
+            if home_chart == 'Bar Chart':
+                visual_bar = px.bar(df_resampled, x="Date", y="Amount", color="Type", barmode="group")
+                st.plotly_chart(visual_bar, use_container_width=True)
+            
+            elif home_chart == 'Line Chart':
+                visual_line = px.line(df_resampled, x="Date", y="Amount", color="Type")
+                st.plotly_chart(visual_line, use_container_width=True)
 
     with displayr2[1]:
         with st.container():
@@ -110,6 +116,10 @@ def home():
 
                 weekly_expenses = weekly_data[weekly_data['Type'] == 'Expense']
                 
+                st.write('')
+                st.write('')
+                st.write('')
+                st.write('')
                 #all_days_data = pd.DataFrame({'Date': date_range})
                 if not weekly_expenses.empty:
                     expenses_by_category = weekly_expenses.groupby('Category')['Amount'].sum().reset_index()
@@ -123,6 +133,10 @@ def home():
                 st.subheader("All Income")
                 weekly_income = weekly_data[weekly_data['Type'] == 'Income']
 
+                st.write('')
+                st.write('')
+                st.write('')
+                st.write('')
                 if not weekly_income.empty:
                     income_by_category = weekly_income.groupby('Category')['Amount'].sum().reset_index()
 
