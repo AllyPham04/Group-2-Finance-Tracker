@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+import calendar
 import pandas as pd
 import plotly.express as px
 import pytz
@@ -10,12 +11,16 @@ from millify import millify
 
 def track():
     st.title("Tracker")
-    col_a1, col_a2 = st.columns([0.2, 0.8])
+    col_a1, col_a2, col_a3 = st.columns([0.2, 0.4, 0.4])
     #st.divider()
     col_b1, col_b2 = st.columns(2)
 
     now = datetime.now()
     now_vn = now.astimezone(pytz.timezone('Asia/Ho_Chi_Minh'))
+
+    _, last_day = calendar.monthrange(now.year, now.month)
+    first_day_of_month = datetime(now.year, now.month, 1).date()
+    last_day_of_month = datetime(now.year, now.month, last_day).date()
 
     total_income = 0
     total_expense = 0
@@ -92,6 +97,7 @@ def track():
             st.subheader("History")
             if os.path.exists('data.csv'):
                 history_df = pd.read_csv('data.csv', parse_dates=True, dayfirst=True)
+                history_df['Date'] = pd.to_datetime(history_df['Date']).dt.date
                 total_income = history_df[history_df['Type'] == 'Income']['Amount'].sum()
                 total_expense = history_df[history_df['Type'] == 'Expense']['Amount'].sum()
                 total_balance = total_income - total_expense
@@ -102,13 +108,14 @@ def track():
                 total_saving = 0
 
             if not history_df.empty:
-                copyhistory_df = history_df.copy()
+                monthly_df = history_df.copy() #monthly_data
+                monthly_df = history_df[(history_df['Date'] >= first_day_of_month) & (history_df['Date'] <= last_day_of_month)]
                 history_df.index = history_df.index + 1
-                history_df['Amount'] = history_df.apply(lambda row: f'+ {row["Amount"]} {currency}' 
+                history_df['Amount'] = history_df.apply(lambda row: f'+ {currency} {row["Amount"]}' 
                                         if row['Type'] == 'Income' 
-                                        else f'- {row["Amount"]} {currency}', axis=1)
+                                        else f'- {currency} {row["Amount"]}', axis=1)
                 #history_df['Month'] = history_df['Date'].dt.strftime("%m")
-                history_container = st.dataframe(history_df.drop(columns='Type'), use_container_width=True)
+                st.dataframe(history_df.drop(columns='Type'), use_container_width=True)
             
             
             if os.path.exists('budget.csv') and os.path.exists('data.csv'):
@@ -116,10 +123,10 @@ def track():
                 for expense in expenses:
                     if expense in budget_df['Category'].values:
                         budget_expense = float(budget_df[budget_df['Category'] == expense]['Budget'].values[0])
-                        expense_cate = float(copyhistory_df[(copyhistory_df['Type'] == 'Expense') & (copyhistory_df['Category'] == expense)]['Amount'].sum())
+                        expense_cate = float(monthly_df[(monthly_df['Type'] == 'Expense') & (monthly_df['Category'] == expense)]['Amount'].sum())
                         if expense_cate > 0.9 * budget_expense:
                             if not st.session_state.get(f'warning_{expense}', False):
-                                st.warning(f"You have spent over 90% of your budget for {expense} category")
+                                st.warning(f"You have spent over 90% of your budget for {expense} category in {calendar.month_name[now.month]}")
                                 st.session_state[f'warning_{expense}'] = True
             else:
                 pass
@@ -140,7 +147,7 @@ def track():
         total_balance_millified = millify(total_balance, precision=2)
         with st.container():
             st.subheader("Total Credits") 
-            st.metric('Balance', f"{total_balance_millified} {currency}", delta=f"{delta_balance_millified} {currency}", delta_color="normal")
+            st.metric('Balance', f"{currency} {total_balance_millified}", delta=f"{currency} {delta_balance_millified}", delta_color="normal")
         
     with col_a2:
         col_a2_1, col_a2_2 = st.columns(2)
@@ -148,10 +155,8 @@ def track():
 
         saving_goal = col_a2_1.number_input("Enter your saving goal:", min_value=0, format="%i", step=10)
 
-        progress = total_saving / saving_goal if saving_goal > 0 else 0
-
         if col_a2_1.button("Save"):
-            col_a2_1.write(f'Your saving goal is {saving_goal} {currency}')
+            col_a2_1.write(f'Your saving goal is {currency} {saving_goal}')
             if total_saving >= saving_goal:
                 st.success("Congratulations! You have reached your saving goal!")
             elif total_saving == 0:
@@ -161,3 +166,6 @@ def track():
                                 names=["Saving", "Remaning"], 
                                 title=f'Saving Progress')
                 col_a2_2.plotly_chart(fig_saving, use_container_width=True)
+    
+    with col_a3:
+        pass
