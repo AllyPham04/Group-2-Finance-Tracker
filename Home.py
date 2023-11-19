@@ -38,25 +38,25 @@ def home():
         total_balance_millified = millify(total_balance, precision=2)
         with st.container():
             st.subheader("Total Credits") 
-            st.metric('Balance', f"{total_balance_millified} {currency}")
+            st.metric('Balance', f"{currency} {total_balance_millified}")
 
     with display_r1[1]:
         total_income_millified = millify(total_income, precision=2)
         with st.container():
             st.subheader("Total Income") 
-            st.metric('Income', f"{total_income_millified} {currency}")
+            st.metric('Income', f"{currency} {total_income_millified}")
 
     with display_r1[2]:
         total_expense_millified = millify(total_expense, precision=2)
         with st.container():
             st.subheader("Total Expense") 
-            st.metric('Expense', f"{total_expense_millified} {currency}")
+            st.metric('Expense', f"{currency} {total_expense_millified}")
 
     with display_r1[3]:
         total_saving_millified = millify(total_saving, precision=2)
         with st.container():
             st.subheader("Total Saving") 
-            st.metric('Saving', f"{total_saving_millified} {currency}")
+            st.metric('Saving', f"{currency} {total_saving_millified}")
 
     button_left = display_r1[0].button("Next Week")
     button_right = display_r1[1].button("Last Week")
