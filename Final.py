@@ -12,8 +12,8 @@ st.set_page_config(layout=layout)
 with st.sidebar:
     selected = option_menu(
             menu_title=None,  # required
-            options=["About Us", "Home", "Set Budget", "Tracker", " Report"], 
-            icons=["info", "house", "calculator", "database", "bar-chart-fill"], 
+            options=["About Us", "Home", "Set Budget", "Tracker", "Report"], 
+            icons=["info", "house", "calculator", "database", "bar-chart"], 
             default_index=0,  # optional
             styles={
                 "container": {"padding": "0!important", "background-color": "#ffefd6"},
