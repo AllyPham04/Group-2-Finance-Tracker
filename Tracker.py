@@ -3,8 +3,6 @@ import os
 import calendar
 import pandas as pd
 import plotly.express as px
-import pytz
-import plotly.graph_objects as go
 from config import *
 from datetime import datetime
 from millify import millify
@@ -19,6 +17,7 @@ def track():
     now = datetime.now()
 
     _, last_day = calendar.monthrange(now.year, now.month)
+
     first_day_of_month = datetime(now.year, now.month, 1).date()
     last_day_of_month = datetime(now.year, now.month, last_day).date()
 
@@ -50,10 +49,8 @@ def track():
 
                     try:
                         history_df = pd.read_csv('data.csv')
-                        #budget_df = pd.read_csv('budget.csv')
                     except (FileNotFoundError, pd.errors.EmptyDataError):
                         history_df = pd.DataFrame(columns=user_data.keys())
-                        #budget_df = pd.DataFrame(columns=['Type', 'Category', 'Budget'])
 
                     history_df = pd.concat([pd.DataFrame(user_data, index=[0]), history_df], ignore_index=True)
                     history_df['Date'] = pd.to_datetime(history_df['Date'], format="%d-%m-%Y")
@@ -109,7 +106,7 @@ def track():
             if not history_df.empty:
 
                 col3_df = history_df.copy()
-                col3_df['Amount'] = history_df.apply(lambda row: row['Amount']
+                col3_df['Amount'] = col3_df.apply(lambda row: row['Amount']
                                                     if row['Type'] == 'Income'
                                                     else row['Amount'] * -1, axis=1)
 
@@ -117,11 +114,12 @@ def track():
                 monthly_df = history_df.copy() #monthly_data
                 monthly_df['Date'] = pd.to_datetime(monthly_df['Date'], dayfirst=True).dt.date
                 monthly_df = monthly_df[(monthly_df['Date'] >= first_day_of_month) & (monthly_df['Date'] <= last_day_of_month)]
+
                 history_df.index = history_df.index + 1
                 history_df['Amount'] = history_df.apply(lambda row: f'+ {currency} {row["Amount"]}' 
                                         if row['Type'] == 'Income' 
                                         else f'- {currency} {row["Amount"]}', axis=1)
-                #history_df['Month'] = history_df['Date'].dt.strftime("%m")
+
                 st.dataframe(history_df.drop(columns='Type'), use_container_width=True)
             
             
@@ -138,13 +136,13 @@ def track():
             else:
                 pass
 
-            if st.form_submit_button("Clear all data"):
-                st.session_state.clear()
-                if os.path.exists('data.csv'):
-                    os.remove('data.csv')
-                    st.success("Data cleared!")
-                user_income.clear()
-                user_expense.clear()
+            #if st.form_submit_button("Clear all data"):
+                #st.session_state.clear()
+                #if os.path.exists('data.csv'):
+                    #os.remove('data.csv')
+                    #st.success("Data cleared!")
+                #user_income.clear()
+                #user_expense.clear()
     st.session_state['previous_total_balance'] = total_balance
 
     delta_balance = total_balance - previous_total_balance
@@ -176,6 +174,7 @@ def track():
 
     with col_a3:
         st.subheader(f'Your balance in {datetime.now().year}')
+
         visual_df = col3_df.copy()
         visual_df['Date'] = pd.to_datetime(visual_df['Date'], format='%d-%m-%Y')
         visual_df['Month'] = visual_df['Date'].dt.strftime('%b')
