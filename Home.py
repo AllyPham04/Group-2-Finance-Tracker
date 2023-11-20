@@ -158,11 +158,8 @@ def home():
         # Hiển thị danh sách các mission
         st.markdown("Choose financial goals that you've achieved:")
 
-        if os.path.exists('earned_achievements.txt'):
-            with open('earned_achievements.txt', 'r') as f:
-                earned_achievement = set(line.strip() for line in f)
-        else:
-            earned_achievement = set()
+        if 'earned_achievement' not in st.session_state:
+            st.session_state['earned_achievement'] = set()
 
         if os.path.exists('daily_login.txt'):
             with open('daily_login.txt', 'r') as f:
@@ -238,10 +235,7 @@ def home():
             if current_streak >= 10:
                 st.success('Congratulations! You have earned the "Loyal User" achievement.')
                 mis1 = f'{calendar.month_name[now.month]}/{now.year} - Loyal User'
-                earned_achievement.add(mis1)
-                with open('earned_achievements.txt', 'w') as f:
-                    for achievement in earned_achievement:
-                        f.write(achievement + '\n')
+                st.session_state['earned_achievement'].add(mis1)
             
         food_expenses = float(monthly_df[monthly_df['Category'] == 'Food']['Amount'].sum())
 
@@ -255,27 +249,21 @@ def home():
 
         #Nhiem vu 2: Necessity account
         if st.checkbox('Necessity account'):
+            mis2 = f'{calendar.month_name[now.month]}/{now.year} - Essential Saver'
             st.write('Your monthly expense (food, transportation, etc.) is no larger than 55% of your income.')
             if last_clicked_mis2 is not None and first_day_of_month <= last_clicked_mis2 <= last_day_of_month:
                 st.error('You have already clicked this checkbox this month! Move to another goal')
 
             if not 0 < (food_expenses + clothes_expense + util_exp + trans_exp) <= (0.55)*income_month:
                 st.error('You haven\'t achieved this goal! Keep working!')
-                earned_achievement.remove(f'{calendar.month_name[now.month]}/{now.year} - Essential Saver')
-                with open('earned_achievements.txt', 'w') as f:
-                    for achievement in earned_achievement:
-                        f.write(achievement + '\n')
+                if mis2 in st.session_state['earned_achievement']:
+                    st.session_state['earned_achievement'].remove(mis2)
 
             elif 0 < (food_expenses + clothes_expense + util_exp + trans_exp) <= (0.55)*income_month:
                 st.success('Congratulations! You have earned the "Essential Saver" achievement.')
-                mis2 = f'{calendar.month_name[now.month]}/{now.year} - Essential Saver'
-                earned_achievement.add(mis2)
+                st.session_state['earned_achievement'].add(mis2)
                 with open('necessity_acc.txt', 'w') as f:
                     f.write(str(today))  # Save the date when the checkbox was clicked
-
-                with open('earned_achievements.txt', 'w') as f:
-                    for achievement in earned_achievement:
-                        f.write(achievement + '\n')
 
 
         #Nhiem vu 3: Financial freedom account
@@ -283,55 +271,41 @@ def home():
         invest_exp = float(monthly_df[monthly_df['Category'] == 'Investment']['Amount'].sum())
 
         if st.checkbox("Financial freedom account"):
+            mis3 = f'{calendar.month_name[now.month]}/{now.year} - Investor\'s Edge'
             st.write('Your expense for investment is about 10% of your income.')
             if last_clicked_mis3 is not None and first_day_of_month <= last_clicked_mis3 <= last_day_of_month:
                 st.error('You have already clicked this checkbox this month! Move to another goal')
 
             if not 0 < invest_exp <= income_month*0.1:
                 st.error('You haven\'t achieved this goal! Keep working!')
-                earned_achievement.remove(f'{calendar.month_name[now.month]}/{now.year} - Investor\'s Edge')
-                with open('earned_achievements.txt', 'w') as f:
-                    for achievement in earned_achievement:
-                        f.write(achievement + '\n')
+                if mis3 in st.session_state['earned_achievement']:
+                    st.session_state['earned_achievement'].remove(mis3)
 
             elif 0 < invest_exp <= income_month*0.1:
                 st.success('Congratulations! You have earned the "Investor\'s Edge" achievement.')
-                mis3 = f'{calendar.month_name[now.month]}/{now.year} - Investor\'s Edge'
-                earned_achievement.add(mis3)
+                st.session_state['earned_achievement'].add(mis3)
                 with open('financial_acc.txt', 'w') as f:
                     f.write(str(today))  # Save the date when the checkbox was clicked
-
-                with open('earned_achievements.txt', 'w') as f:
-                    for achievement in earned_achievement:
-                        f.write(achievement + '\n')
-
                 
         #Nhiem vu 4: Education account
 
         edu_exp = float(monthly_df[monthly_df['Category']=='Education']['Amount'].sum())
 
         if st.checkbox("Education account"):
+            mis4 = f'{calendar.month_name[now.month]}/{now.year} - Academic Aces'
             st.write('Your expense for education is about 10% of your income.')
             if last_clicked_mis4 is not None and first_day_of_month <= last_clicked_mis4 <= last_day_of_month:
                 st.error('You have already clicked this checkbox this month! Move to another goal')
                 
             if not 0 < edu_exp <= 0.1 * income_month:
                 st.error('You haven\'t achieved this goal! Keep working!')
-                earned_achievement.remove(f'{calendar.month_name[now.month]}/{now.year} - Academic Aces')
-                with open('earned_achievements.txt', 'w') as f:
-                    for achievement in earned_achievement:
-                        f.write(achievement + '\n')
-
+                if mis4 in st.session_state['earned_achievement']:
+                    st.session_state['earned_achievement'].remove(mis4)
             elif 0 < edu_exp <= 0.1 * income_month:
                 st.success('Congratulations! You have earned the "Academic Aces" achievement.')
-                mis4 = f'{calendar.month_name[now.month]}/{now.year} - Academic Aces'
-                earned_achievement.add(mis4)
+                st.session_state['earned_achievement'].add(mis4)
                 with open('education_acc.txt', 'w') as f:
                     f.write(str(today))  # Save the date when the checkbox was clicked
-
-                with open('earned_achievements.txt', 'w') as f:
-                    for achievement in earned_achievement:
-                        f.write(achievement + '\n')
 
                 
         #Nhiem vu 5: Long-term saving
@@ -339,30 +313,22 @@ def home():
         saving_exp = float(monthly_df[monthly_df['Category'] == 'Saving']['Amount'].sum())
 
         if st.checkbox("Long-term saving for spending account"):
+            mis5 = f'{calendar.month_name[now.month]}/{now.year} - Future Fortune Fund'
             st.write('Your saving is about 10% of your income.')
             if last_clicked_mis5 is not None and first_day_of_month <= last_clicked_mis5 <= last_day_of_month:
                 st.error('You have already clicked this checkbox this month! Move to another goal')
                 
             if not 0 < saving_exp <= 0.1*income_month:
                 st.error('You haven\'t achieved this goal! Keep working!')
-                earned_achievement.remove(f'{calendar.month_name[now.month]}/{now.year} - Future Fortune Fund')
-                with open('earned_achievements.txt', 'w') as f:
-                    for achievement in earned_achievement:
-                        f.write(achievement + '\n')
+                if mis5 in st.session_state['earned_achievement']:
+                    st.session_state['earned_achievement'].remove(mis5)
 
             elif 0 < saving_exp <= 0.1*income_month:
                 st.success('Congratulations! You have earned the "Future Fortune Fund" achievement.')
-                mis5 = f'{calendar.month_name[now.month]}/{now.year} - Future Fortune Fund'
-                earned_achievement.add(mis5)
+                st.session_state['earned_achievement'].add(mis5)
                 with open('long_term_saving.txt', 'w') as f:
                     f.write(str(today))  # Save the date when the checkbox was clicked
-
-                with open('earned_achievements.txt', 'w') as f:
-                    for achievement in earned_achievement:
-                        f.write(achievement + '\n')
         
         st.subheader('Achievement')
-        if os.path.exists('earned_achievements.txt'):
-            with open('earned_achievements.txt', 'r') as f:
-                for achievement in earned_achievement:
-                    st.write(f'- {achievement}')
+        for achievement in st.session_state['earned_achievement']:
+            st.write(f'- {achievement}')
