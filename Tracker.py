@@ -119,7 +119,7 @@ def track():
                                         if row['Type'] == 'Income' 
                                         else f'- {currency} {row["Amount"]}', axis=1)
 
-                st.dataframe(history_df.drop(columns='Type'), use_container_width=True)
+            st.dataframe(history_df.drop(columns='Type'), use_container_width=True)
             
             
             if os.path.exists('budget.csv') and os.path.exists('data.csv'):
