@@ -90,10 +90,11 @@ def track():
         st.write('')
         st.write('')
         st.write('')
-        with st.form("transactions_history", clear_on_submit=True):
+        st.write('')
+        with st.container():
             st.subheader("History")
             if os.path.exists('data.csv'):
-                history_df = pd.read_csv('data.csv', parse_dates=True, dayfirst=True)
+                history_df = pd.read_csv('data.csv')
                 col3_df = history_df.copy()
                 total_income = history_df[history_df['Type'] == 'Income']['Amount'].sum()
                 total_expense = history_df[history_df['Type'] == 'Expense']['Amount'].sum()
@@ -135,9 +136,8 @@ def track():
                                 st.session_state[f'warning_{expense}'] = True
             else:
                 pass
-
-            if st.form_submit_button("Save"):
-                pass
+            #edit_button = st.button('Edit Data')
+            #if edit_button:
                 #st.session_state.clear()
                 #if os.path.exists('data.csv'):
                     #os.remove('data.csv')
