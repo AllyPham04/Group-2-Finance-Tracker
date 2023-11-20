@@ -100,12 +100,11 @@ def track():
                 total_saving = history_df[(history_df['Type'] == 'Income') & (history_df['Category'] == 'Saving')]['Amount'].sum()
             else:
                 history_df = pd.DataFrame()
+                col3_df = history_df.copy()
                 total_balance = 0
                 total_saving = 0
 
             if not history_df.empty:
-
-                col3_df = history_df.copy()
                 col3_df['Amount'] = col3_df.apply(lambda row: row['Amount']
                                                     if row['Type'] == 'Income'
                                                     else row['Amount'] * -1, axis=1)
