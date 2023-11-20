@@ -94,6 +94,7 @@ def track():
             st.subheader("History")
             if os.path.exists('data.csv'):
                 history_df = pd.read_csv('data.csv', parse_dates=True, dayfirst=True)
+                col3_df = history_df.copy()
                 total_income = history_df[history_df['Type'] == 'Income']['Amount'].sum()
                 total_expense = history_df[history_df['Type'] == 'Expense']['Amount'].sum()
                 total_balance = total_income - total_expense
@@ -135,11 +136,12 @@ def track():
             else:
                 pass
 
-            #if st.form_submit_button("Clear all data"):
+            if st.form_submit_button("Save"):
+                pass
                 #st.session_state.clear()
                 #if os.path.exists('data.csv'):
-                    #os.remove('data.csv')
-                    #st.success("Data cleared!")
+                #    os.remove('data.csv')
+                #    st.success("Data cleared!")
                 #user_income.clear()
                 #user_expense.clear()
     st.session_state['previous_total_balance'] = total_balance
