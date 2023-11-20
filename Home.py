@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 import plotly.express as px
+import calendar
 from millify import millify
 from datetime import timedelta
 from datetime import datetime
@@ -144,3 +145,169 @@ def home():
                     st.plotly_chart(visual_pie, use_container_width=True)
                 else:
                     st.warning("No income data available for the selected week.")
+
+    with display[1]:
+        # Tạo danh sách các mission
+        missions = ["Daily Login", "Necessity account",
+                "Financial freedom account", "Education account",
+                "Long-term saving for spending account"]
+        sub_text = ['You add transactions everyday','<= 55% Income',
+                    '~ 10% Income','~ 10% Income','~ 10% Income']
+
+        # Hiển thị danh sách các mission
+        st.markdown("Choose financial goals that you've achieved:")
+
+        #Bien dem xu 
+        if os.path.exists('coins.txt'):
+            with open('coins.txt', 'r') as f:
+                coins = int(f.read())
+        else:
+            coins = 0
+
+        if os.path.exists('daily_login.txt'):
+            with open('daily_login.txt', 'r') as f:
+                last_clicked_mis1 = datetime.strptime(f.read(), '%Y-%m-%d').date()
+        else:
+            last_clicked_mis1 = None
+
+        if os.path.exists('necessity_acc.txt'):
+            with open('necessity_acc.txt', 'r') as f:
+                last_clicked_mis2 = datetime.strptime(f.read(), '%Y-%m-%d').date()
+        else:
+            last_clicked_mis2 = None
+        
+        if os.path.exists('financial_acc.txt'):
+            with open('financial_acc.txt', 'r') as f:
+                last_clicked_mis3 = datetime.strptime(f.read(), '%Y-%m-%d').date()
+        else:
+            last_clicked_mis3 = None
+        
+        if os.path.exists('education_acc.txt'):
+            with open('education_acc.txt', 'r') as f:
+                last_clicked_mis4 = datetime.strptime(f.read(), '%Y-%m-%d').date()
+        else:
+            last_clicked_mis4 = None
+        
+        if os.path.exists('long_term_saving.txt'):
+            with open('long_term_saving.txt', 'r') as f:
+                last_clicked_mis5 = datetime.strptime(f.read(), '%Y-%m-%d').date()
+        else:
+            last_clicked_mis5 = None
+
+        now = datetime.now()
+        first_day_of_month = datetime(now.year,now.month,1).date()
+        _, last_day = calendar.monthrange(now.year,now.month)
+        last_day_of_month = datetime(now.year,now.month,last_day).date()
+
+        monthly_df = df.copy()
+
+        monthly_df['Date'] = pd.to_datetime(monthly_df['Date'], dayfirst=True).dt.date
+        monthly_df = monthly_df[(monthly_df['Date'] >= first_day_of_month) & (monthly_df['Date'] <= last_day_of_month)]
+
+        today_df = monthly_df.copy()
+
+        #In ra data theo tháng hiện tại mà đã nhóm vào từng Category
+        monthly_df = monthly_df.groupby(['Type', 'Category'])['Amount'].sum().reset_index()
+
+        today = now.date()
+        today_df = today_df[today_df['Date'] == today]
+
+        #Nhiem vu 1: Daily Login
+        if st.checkbox('Daily Login'):
+            st.write('You add transactions everyday.')
+            st.write('Reward: 50 coins')
+            if today_df.empty:
+                st.error('You haven\'t achieved this mission! Keep working!')
+            elif last_clicked_mis1 == today:
+                st.error('You have already clicked this checkbox today! Move to another mission')
+            else:
+                coins += 50 
+                with open('coins.txt', 'w') as f:
+                    f.write(str(coins))  # Save the coins to a file
+                with open('daily_login.txt', 'w') as f:
+                    f.write(str(today))  # Save the date when the checkbox was clicked
+            
+        food_expenses = float(monthly_df[monthly_df['Category'] == 'Food']['Amount'].sum())
+
+        clothes_expense = float(monthly_df[monthly_df['Category'] == 'Clothes']['Amount'].sum())
+
+        cosmetic_exp = float(monthly_df[monthly_df['Category'] == 'Cosmetic']['Amount'].sum())
+
+        trans_exp = float(monthly_df[monthly_df['Category'] == 'Transportation']['Amount'].sum())
+
+        income_month = float(monthly_df[monthly_df['Type']=='Income']['Amount'].sum())
+
+        #Nhiem vu 2: Necessity account
+        if st.checkbox('Necessity account'):
+            st.write('Your monthly expense (food, transportation, etc.) is no larger than 55% of your income.')
+            st.write('Reward: 100 coins')
+            if last_clicked_mis2 is not None and first_day_of_month <= last_clicked_mis2 <= last_day_of_month:
+                st.error('You have already clicked this checkbox this month! Move to another mission')
+            elif not 0 < (food_expenses + clothes_expense + cosmetic_exp + trans_exp) <= (0.55)*income_month:
+                st.error('You haven\'t achieved this mission! Keep working!')
+            elif 0 < (food_expenses + clothes_expense + cosmetic_exp + trans_exp) <= (0.55)*income_month:
+                coins += 100
+                with open('coins.txt', 'w') as f:
+                    f.write(str(coins))  # Save the coins to a file
+                with open('necessity_acc.txt', 'w') as f:
+                    f.write(str(today))  # Save the date when the checkbox was clicked
+
+
+        #Nhiem vu 3: Financial freedom account
+
+        invest_exp = float(monthly_df[monthly_df['Category'] == 'Investment']['Amount'].sum())
+
+        if st.checkbox("Financial freedom account"):
+            st.write('Your expense for investment is about 10% of your income.')
+            st.write('Reward: 100 coins')
+            if last_clicked_mis3 is not None and first_day_of_month <= last_clicked_mis3 <= last_day_of_month:
+                st.error('You have already clicked this checkbox this month! Move to another mission')
+            elif not 0 < invest_exp <= income_month*0.1:
+                st.error('You haven\'t achieved this mission! Keep working!')
+            elif 0 < invest_exp <= income_month*0.1:
+                coins += 100
+                with open('coins.txt', 'w') as f:
+                    f.write(str(coins))  # Save the coins to a file
+                with open('financial_acc.txt', 'w') as f:
+                    f.write(str(today))  # Save the date when the checkbox was clicked
+
+                
+        #Nhiem vu 4: Education account
+
+        edu_exp = float(monthly_df[monthly_df['Category']=='Education']['Amount'].sum())
+
+        if st.checkbox("Education account"):
+            st.write('Your expense for education is about 10% of your income.')
+            st.write('Reward: 50 coins')
+            if last_clicked_mis4 is not None and first_day_of_month <= last_clicked_mis4 <= last_day_of_month:
+                st.error('You have already clicked this checkbox this month! Move to another mission')
+            elif not 0 < edu_exp <= 0.1 * income_month:
+                st.error('You haven\'t achieved this mission! Keep working!')
+            elif 0 < edu_exp <= 0.1 * income_month:
+                coins += 50 
+                with open('coins.txt', 'w') as f:
+                    f.write(str(coins))  # Save the coins to a file
+                with open('education_acc.txt', 'w') as f:
+                    f.write(str(today))  # Save the date when the checkbox was clicked
+
+                
+        #Nhiem vu 5: Long-term saving
+
+        saving_exp = float(monthly_df[monthly_df['Category'] == 'Saving']['Amount'].sum())
+
+        if st.checkbox("Long-term saving for spending account"):
+            st.write('Your saving is about 10% of your income.')
+            st.write('Reward: 50 coins')
+            if last_clicked_mis5 is not None and first_day_of_month <= last_clicked_mis5 <= last_day_of_month:
+                st.error('You have already clicked this checkbox this month! Move to another mission')
+            elif not 0 < saving_exp <= 0.1*income_month:
+                st.error('You haven\'t achieved this mission! Keep working!')
+            elif 0 < saving_exp <= 0.1*income_month:
+                coins += 50 
+                with open('coins.txt', 'w') as f:
+                    f.write(str(coins))  # Save the coins to a file
+                with open('long_term_saving.txt', 'w') as f:
+                    f.write(str(today))  # Save the date when the checkbox was clicked
+
+        st.subheader('Reward')
+        st.metric('Coins', f'{coins}')
