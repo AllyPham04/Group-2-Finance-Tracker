@@ -99,7 +99,7 @@ def track():
                 total_balance = total_income - total_expense
                 total_saving = history_df[(history_df['Type'] == 'Income') & (history_df['Category'] == 'Saving')]['Amount'].sum()
             else:
-                history_df = pd.DataFrame()
+                history_df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount'])
                 col3_df = history_df.copy()
                 total_balance = 0
                 total_saving = 0
