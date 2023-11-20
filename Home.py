@@ -170,30 +170,6 @@ def home():
             last_clicked_mis1 = None
             current_streak = 0
 
-        if os.path.exists('necessity_acc.txt'):
-            with open('necessity_acc.txt', 'r') as f:
-                last_clicked_mis2 = datetime.strptime(f.read(), '%Y-%m-%d').date()
-        else:
-            last_clicked_mis2 = None
-        
-        if os.path.exists('financial_acc.txt'):
-            with open('financial_acc.txt', 'r') as f:
-                last_clicked_mis3 = datetime.strptime(f.read(), '%Y-%m-%d').date()
-        else:
-            last_clicked_mis3 = None
-        
-        if os.path.exists('education_acc.txt'):
-            with open('education_acc.txt', 'r') as f:
-                last_clicked_mis4 = datetime.strptime(f.read(), '%Y-%m-%d').date()
-        else:
-            last_clicked_mis4 = None
-        
-        if os.path.exists('long_term_saving.txt'):
-            with open('long_term_saving.txt', 'r') as f:
-                last_clicked_mis5 = datetime.strptime(f.read(), '%Y-%m-%d').date()
-        else:
-            last_clicked_mis5 = None
-
         now = datetime.now()
 
         first_day_of_month = datetime(now.year,now.month,1).date()
@@ -251,8 +227,6 @@ def home():
         if st.checkbox('Necessity account'):
             mis2 = f'{calendar.month_name[now.month]}/{now.year} - Essential Saver'
             st.write('Your monthly expense (food, transportation, etc.) is no larger than 55% of your income.')
-            if last_clicked_mis2 is not None and first_day_of_month <= last_clicked_mis2 <= last_day_of_month:
-                st.error('You have already clicked this checkbox this month! Move to another goal')
 
             if not 0 < (food_expenses + clothes_expense + util_exp + trans_exp) <= (0.55)*income_month:
                 st.error('You haven\'t achieved this goal! Keep working!')
@@ -273,8 +247,6 @@ def home():
         if st.checkbox("Financial freedom account"):
             mis3 = f'{calendar.month_name[now.month]}/{now.year} - Investor\'s Edge'
             st.write('Your expense for investment is about 10% of your income.')
-            if last_clicked_mis3 is not None and first_day_of_month <= last_clicked_mis3 <= last_day_of_month:
-                st.error('You have already clicked this checkbox this month! Move to another goal')
 
             if not 0 < invest_exp <= income_month*0.1:
                 st.error('You haven\'t achieved this goal! Keep working!')
@@ -294,8 +266,6 @@ def home():
         if st.checkbox("Education account"):
             mis4 = f'{calendar.month_name[now.month]}/{now.year} - Academic Aces'
             st.write('Your expense for education is about 10% of your income.')
-            if last_clicked_mis4 is not None and first_day_of_month <= last_clicked_mis4 <= last_day_of_month:
-                st.error('You have already clicked this checkbox this month! Move to another goal')
                 
             if not 0 < edu_exp <= 0.1 * income_month:
                 st.error('You haven\'t achieved this goal! Keep working!')
@@ -315,8 +285,6 @@ def home():
         if st.checkbox("Long-term saving for spending account"):
             mis5 = f'{calendar.month_name[now.month]}/{now.year} - Future Fortune Fund'
             st.write('Your saving is about 10% of your income.')
-            if last_clicked_mis5 is not None and first_day_of_month <= last_clicked_mis5 <= last_day_of_month:
-                st.error('You have already clicked this checkbox this month! Move to another goal')
                 
             if not 0 < saving_exp <= 0.1*income_month:
                 st.error('You haven\'t achieved this goal! Keep working!')
