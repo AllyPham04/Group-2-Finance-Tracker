@@ -239,7 +239,6 @@ def home():
                 st.success('Congratulations! You have earned the "Loyal User" achievement.')
                 mis1 = f'{calendar.month_name[now.month]}/{now.year} - Loyal User'
                 earned_achievement.add(mis1)
-            if os.path.exists('earned_achievements.txt'):
                 with open('earned_achievements.txt', 'w') as f:
                     for achievement in earned_achievement:
                         f.write(achievement + '\n')
@@ -270,7 +269,6 @@ def home():
                 with open('necessity_acc.txt', 'w') as f:
                     f.write(str(today))  # Save the date when the checkbox was clicked
 
-            if os.path.exists('earned_achievements.txt'):
                 with open('earned_achievements.txt', 'w') as f:
                     for achievement in earned_achievement:
                         f.write(achievement + '\n')
@@ -295,7 +293,6 @@ def home():
                 with open('financial_acc.txt', 'w') as f:
                     f.write(str(today))  # Save the date when the checkbox was clicked
 
-            if os.path.exists('earned_achievements.txt'):
                 with open('earned_achievements.txt', 'w') as f:
                     for achievement in earned_achievement:
                         f.write(achievement + '\n')
@@ -320,7 +317,6 @@ def home():
                 with open('education_acc.txt', 'w') as f:
                     f.write(str(today))  # Save the date when the checkbox was clicked
 
-            if os.path.exists('earned_achievements.txt'):
                 with open('earned_achievements.txt', 'w') as f:
                     for achievement in earned_achievement:
                         f.write(achievement + '\n')
@@ -345,7 +341,6 @@ def home():
                 with open('long_term_saving.txt', 'w') as f:
                     f.write(str(today))  # Save the date when the checkbox was clicked
 
-            if os.path.exists('earned_achievements.txt'):
                 with open('earned_achievements.txt', 'w') as f:
                     for achievement in earned_achievement:
                         f.write(achievement + '\n')
