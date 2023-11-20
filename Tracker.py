@@ -136,13 +136,14 @@ def track():
             else:
                 pass
 
-            if st.form_submit_button("Clear all data"):
-                st.session_state.clear()
-                if os.path.exists('data.csv'):
-                    os.remove('data.csv')
-                    st.success("Data cleared!")
-                user_income.clear()
-                user_expense.clear()
+            if st.form_submit_button("Save"):
+                pass
+                #st.session_state.clear()
+                #if os.path.exists('data.csv'):
+                    #os.remove('data.csv')
+                    #st.success("Data cleared!")
+                #user_income.clear()
+                #user_expense.clear()
     st.session_state['previous_total_balance'] = total_balance
 
     delta_balance = total_balance - previous_total_balance
