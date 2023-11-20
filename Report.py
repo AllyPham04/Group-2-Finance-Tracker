@@ -3,7 +3,6 @@ import os
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-import pytz
 from config import *
 from datetime import datetime
 
@@ -21,7 +20,6 @@ def rep():
     # -----------------------------------------
 
     now = datetime.now()
-    now_vn = now.astimezone(pytz.timezone('Asia/Ho_Chi_Minh'))
 
     def summarize(summary_df):
     # Set name which divided into 3 columns
@@ -48,8 +46,8 @@ def rep():
         with st.form('range_form', clear_on_submit=False):
 
             range_manual_start_date_input, range_manual_end_date_input = st.columns(2)
-            range_manual_start_date_input = range_manual_start_date_input.date_input('From', value=now_vn.date(), format="DD/MM/YYYY")
-            range_manual_end_date_input = range_manual_end_date_input.date_input('To', value=now_vn.date(), format="DD/MM/YYYY")
+            range_manual_start_date_input = range_manual_start_date_input.date_input('From', value=now.date(), format="DD/MM/YYYY")
+            range_manual_end_date_input = range_manual_end_date_input.date_input('To', value=now.date(), format="DD/MM/YYYY")
             range_manual_start_date = pd.to_datetime(
                 range_manual_start_date_input, format='%Y-%m-%d')
             range_manual_end_date = pd.to_datetime(
@@ -62,7 +60,7 @@ def rep():
             range_type = st.selectbox(label='Type', 
                                     options=['Income and Expense', 'Categories'])
 
-            range_button = st.form_submit_button('Submit')
+            st.form_submit_button('Submit')
         options, summary = st.columns(2, gap='large')
         with options:
             if range_type == 'Income and Expense':
@@ -79,7 +77,7 @@ def rep():
                     visualize_type, visualize_cate_type = st.columns(2)
                     visualize_type = visualize_type.selectbox('Visualization type', ['Line chart', 'Bar chart', 'Pie chart'])
                     visualize_cate_type = visualize_cate_type.selectbox('Type', ['Income', 'Expense'])
-                    visualize_submit = st.form_submit_button('Submit')
+                    st.form_submit_button('Submit')
 
         with summary:
             summarize(range_df)
