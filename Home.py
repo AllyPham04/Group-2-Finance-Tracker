@@ -261,7 +261,11 @@ def home():
 
             if not 0 < (food_expenses + clothes_expense + util_exp + trans_exp) <= (0.55)*income_month:
                 st.error('You haven\'t achieved this goal! Keep working!')
-                earned_achievement.discard(f'{calendar.month_name[now.month]}/{now.year} - Essential Saver')
+                earned_achievement.remove(f'{calendar.month_name[now.month]}/{now.year} - Essential Saver')
+                with open('earned_achievements.txt', 'w') as f:
+                    for achievement in earned_achievement:
+                        f.write(achievement + '\n')
+                        
             elif 0 < (food_expenses + clothes_expense + util_exp + trans_exp) <= (0.55)*income_month:
                 st.success('Congratulations! You have earned the "Essential Saver" achievement.')
                 mis2 = f'{calendar.month_name[now.month]}/{now.year} - Essential Saver'
@@ -285,7 +289,11 @@ def home():
 
             if not 0 < invest_exp <= income_month*0.1:
                 st.error('You haven\'t achieved this goal! Keep working!')
-                earned_achievement.discard(f'{calendar.month_name[now.month]}/{now.year} - Investor\'s Edge')
+                earned_achievement.remove(f'{calendar.month_name[now.month]}/{now.year} - Investor\'s Edge')
+                with open('earned_achievements.txt', 'w') as f:
+                    for achievement in earned_achievement:
+                        f.write(achievement + '\n')
+
             elif 0 < invest_exp <= income_month*0.1:
                 st.success('Congratulations! You have earned the "Investor\'s Edge" achievement.')
                 mis3 = f'{calendar.month_name[now.month]}/{now.year} - Investor\'s Edge'
@@ -309,7 +317,11 @@ def home():
                 
             if not 0 < edu_exp <= 0.1 * income_month:
                 st.error('You haven\'t achieved this goal! Keep working!')
-                earned_achievement.discard(f'{calendar.month_name[now.month]}/{now.year} - Academic Aces')
+                earned_achievement.remove(f'{calendar.month_name[now.month]}/{now.year} - Academic Aces')
+                with open('earned_achievements.txt', 'w') as f:
+                    for achievement in earned_achievement:
+                        f.write(achievement + '\n')
+
             elif 0 < edu_exp <= 0.1 * income_month:
                 st.success('Congratulations! You have earned the "Academic Aces" achievement.')
                 mis4 = f'{calendar.month_name[now.month]}/{now.year} - Academic Aces'
@@ -333,7 +345,11 @@ def home():
                 
             if not 0 < saving_exp <= 0.1*income_month:
                 st.error('You haven\'t achieved this goal! Keep working!')
-                earned_achievement.discard(f'{calendar.month_name[now.month]}/{now.year} - Future Fortune Fund')
+                earned_achievement.remove(f'{calendar.month_name[now.month]}/{now.year} - Future Fortune Fund')
+                with open('earned_achievements.txt', 'w') as f:
+                    for achievement in earned_achievement:
+                        f.write(achievement + '\n')
+
             elif 0 < saving_exp <= 0.1*income_month:
                 st.success('Congratulations! You have earned the "Future Fortune Fund" achievement.')
                 mis5 = f'{calendar.month_name[now.month]}/{now.year} - Future Fortune Fund'
