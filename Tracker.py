@@ -175,9 +175,9 @@ def track():
         st.subheader(f'Your balance in {datetime.now().year}')
 
         visual_df = col3_df.copy()
-        if not visual_df.empty:
-            visual_df['Date'] = pd.to_datetime(visual_df['Date'], format='%d-%m-%Y')
-            visual_df['Month'] = visual_df['Date'].dt.strftime('%b')
+        
+        visual_df['Date'] = pd.to_datetime(visual_df['Date'], format='%d-%m-%Y')
+        visual_df['Month'] = visual_df['Date'].dt.strftime('%b')
 
         # Group by month and sum 'Amount' for each group
         grouped_data = visual_df.groupby('Month')['Amount'].sum().reset_index()
