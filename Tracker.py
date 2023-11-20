@@ -119,7 +119,7 @@ def track():
                                         if row['Type'] == 'Income' 
                                         else f'- {currency} {row["Amount"]}', axis=1)
 
-            st.dataframe(history_df.drop(columns='Type'), use_container_width=True)
+                st.dataframe(history_df.drop(columns='Type'), use_container_width=True)
             
             
             if os.path.exists('budget.csv') and os.path.exists('data.csv'):
@@ -175,8 +175,9 @@ def track():
         st.subheader(f'Your balance in {datetime.now().year}')
 
         visual_df = col3_df.copy()
-        visual_df['Date'] = pd.to_datetime(visual_df['Date'], format='%d-%m-%Y')
-        visual_df['Month'] = visual_df['Date'].dt.strftime('%b')
+        if not visual_df.empty:
+            visual_df['Date'] = pd.to_datetime(visual_df['Date'], format='%d-%m-%Y')
+            visual_df['Month'] = visual_df['Date'].dt.strftime('%b')
 
         # Group by month and sum 'Amount' for each group
         grouped_data = visual_df.groupby('Month')['Amount'].sum().reset_index()
