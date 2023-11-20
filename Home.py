@@ -265,7 +265,7 @@ def home():
                 with open('earned_achievements.txt', 'w') as f:
                     for achievement in earned_achievement:
                         f.write(achievement + '\n')
-                        
+
             elif 0 < (food_expenses + clothes_expense + util_exp + trans_exp) <= (0.55)*income_month:
                 st.success('Congratulations! You have earned the "Essential Saver" achievement.')
                 mis2 = f'{calendar.month_name[now.month]}/{now.year} - Essential Saver'
@@ -353,7 +353,7 @@ def home():
             elif 0 < saving_exp <= 0.1*income_month:
                 st.success('Congratulations! You have earned the "Future Fortune Fund" achievement.')
                 mis5 = f'{calendar.month_name[now.month]}/{now.year} - Future Fortune Fund'
-                earned_achievement.add(f'{calendar.month_name[now.month]}/{now.year} - Future Fortune Fund')
+                earned_achievement.add(mis5)
                 with open('long_term_saving.txt', 'w') as f:
                     f.write(str(today))  # Save the date when the checkbox was clicked
 
