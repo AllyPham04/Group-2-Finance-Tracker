@@ -3,3 +3,4 @@ pandas
 plotly
 matplotlib
 millify
+streamlit_option_menu
