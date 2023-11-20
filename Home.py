@@ -239,9 +239,10 @@ def home():
                 st.success('Congratulations! You have earned the "Loyal User" achievement.')
                 mis1 = f'{calendar.month_name[now.month]}/{now.year} - Loyal User'
                 earned_achievement.add(mis1)
-            with open('earned_achievements.txt', 'w') as f:
-                for achievement in earned_achievement:
-                    f.write(achievement + '\n')
+            if os.path.exists('earned_achievements.txt'):
+                with open('earned_achievements.txt', 'w') as f:
+                    for achievement in earned_achievement:
+                        f.write(achievement + '\n')
             
         food_expenses = float(monthly_df[monthly_df['Category'] == 'Food']['Amount'].sum())
 
@@ -269,9 +270,10 @@ def home():
                 with open('necessity_acc.txt', 'w') as f:
                     f.write(str(today))  # Save the date when the checkbox was clicked
 
-            with open('earned_achievements.txt', 'w') as f:
-                for achievement in earned_achievement:
-                    f.write(achievement + '\n')
+            if os.path.exists('earned_achievements.txt'):
+                with open('earned_achievements.txt', 'w') as f:
+                    for achievement in earned_achievement:
+                        f.write(achievement + '\n')
 
 
         #Nhiem vu 3: Financial freedom account
@@ -293,9 +295,10 @@ def home():
                 with open('financial_acc.txt', 'w') as f:
                     f.write(str(today))  # Save the date when the checkbox was clicked
 
-            with open('earned_achievements.txt', 'w') as f:
-                for achievement in earned_achievement:
-                    f.write(achievement + '\n')
+            if os.path.exists('earned_achievements.txt'):
+                with open('earned_achievements.txt', 'w') as f:
+                    for achievement in earned_achievement:
+                        f.write(achievement + '\n')
 
                 
         #Nhiem vu 4: Education account
@@ -317,9 +320,10 @@ def home():
                 with open('education_acc.txt', 'w') as f:
                     f.write(str(today))  # Save the date when the checkbox was clicked
 
-            with open('earned_achievements.txt', 'w') as f:
-                for achievement in earned_achievement:
-                    f.write(achievement + '\n')
+            if os.path.exists('earned_achievements.txt'):
+                with open('earned_achievements.txt', 'w') as f:
+                    for achievement in earned_achievement:
+                        f.write(achievement + '\n')
 
                 
         #Nhiem vu 5: Long-term saving
@@ -340,12 +344,14 @@ def home():
                 earned_achievement.add(f'{calendar.month_name[now.month]}/{now.year} - Future Fortune Fund')
                 with open('long_term_saving.txt', 'w') as f:
                     f.write(str(today))  # Save the date when the checkbox was clicked
-                    
-            with open('earned_achievements.txt', 'w') as f:
-                for achievement in earned_achievement:
-                    f.write(achievement + '\n')
+
+            if os.path.exists('earned_achievements.txt'):
+                with open('earned_achievements.txt', 'w') as f:
+                    for achievement in earned_achievement:
+                        f.write(achievement + '\n')
         
         st.subheader('Achievement')
-        with open('earned_achievements.txt', 'r') as f:
-            for achievement in earned_achievement:
-                st.write(f'- {achievement}')
+        if os.path.exists('earned_achievements.txt'):
+            with open('earned_achievements.txt', 'r') as f:
+                for achievement in earned_achievement:
+                    st.write(f'- {achievement}')
