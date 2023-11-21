@@ -169,15 +169,14 @@ def track():
         if col_a2_1.button("Save"):
             col_a2_1.write(f'Your saving goal is {saving_goal} {currency}')
             if total_saving >= saving_goal:
-                if total_saving >= saving_goal:
-                    st.success("Congratulations! You have reached your saving goal!")
-                elif total_saving == 0:
-                    st.warning("You have not saved anything yet!")
-                else:
-                    fig_saving = px.pie(values=[total_saving, saving_goal - total_saving],
-                                        names=["Saving", "Remaning"],
-                                        title=f'Saving Progress')
-                    col_a2_2.plotly_chart(fig_saving, use_container_width=True)
+                st.success("Congratulations! You have reached your saving goal!")
+            elif total_saving == 0:
+                st.warning("You have not saved anything yet!")
+            else:
+                fig_saving = px.pie(values=[total_saving, saving_goal - total_saving],
+                                    names=["Saving", "Remaning"],
+                                    title=f'Saving Progress')
+                col_a2_2.plotly_chart(fig_saving, use_container_width=True)
 
     with col_a3:
         st.subheader(f'Your balance in {datetime.now().year}')
