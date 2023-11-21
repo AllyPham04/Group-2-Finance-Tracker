@@ -168,7 +168,9 @@ def track():
 
         if col_a2_1.button("Save"):
             col_a2_1.write(f'Your saving goal is {saving_goal} {currency}')
-            if total_saving >= saving_goal:
+            if saving_goal == 0:
+                st.error("You haven't set you saving goal!")
+            elif total_saving >= saving_goal and saving_goal > 0:
                 st.success("Congratulations! You have reached your saving goal!")
             elif total_saving == 0:
                 st.warning("You have not saved anything yet!")
