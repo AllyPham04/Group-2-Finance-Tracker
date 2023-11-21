@@ -1,5 +1,5 @@
 import streamlit as st
-import  base64
+import base64
 
 incomes = ["Salary", "Saving", "Bonus", "Side Job", "Other Income"]
 expenses = ["Food", "Housing", "Entertainment", "Education", "Utilities", "Transportation", "Investment", "Other Expense"]
