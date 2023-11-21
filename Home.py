@@ -28,7 +28,6 @@ def home():
 
     try:
         df = pd.read_csv('data.csv', parse_dates=['Date'], dayfirst=True)
-        df['Date'] = df['Date'].dt.date
     except (FileNotFoundError, pd.errors.EmptyDataError):
         df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount'])
 
@@ -36,6 +35,7 @@ def home():
     display_r1 = display[0].columns(4)
 
     if os.path.exists('data.csv'):
+        df['Date'] = df['Date'].dt.date
         total_income = df[df['Type'] == 'Income']['Amount'].sum()
         total_expense = df[df['Type'] == 'Expense']['Amount'].sum()
         total_balance = total_income - total_expense
