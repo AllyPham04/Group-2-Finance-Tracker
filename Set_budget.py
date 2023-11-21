@@ -4,6 +4,8 @@ import pandas as pd
 import os
 
 def budget():
+    local_css('style.css')
+    background()
     st.title("Set Budget")
 
     col1, col2 = st.columns(2, gap="large")
@@ -55,6 +57,7 @@ def budget():
             clear_data = st.button("Clear All Data")
 
             if clear_data:
+                st.session_state.clear()
                 if os.path.exists("budget.csv"):
                     os.remove("budget.csv")
                     st.success("All data cleared!")

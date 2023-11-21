@@ -7,25 +7,25 @@ from Set_budget import budget
 from Tracker import track
 from Report import rep
 
-
 st.set_page_config(layout=layout)
+
 with st.sidebar:
     selected = option_menu(
             menu_title=None,  # required
-            options=["About Us", "Home", "Set Budget", "Tracker", "Report"], 
-            icons=["info", "house", "calculator", "database", "bar-chart"], 
+            options=["About Us", "Home", "Set Budget", "Tracker", "Report"],
+            icons=["info", "house", "calculator", "database", "bar-chart-fill"], 
             default_index=0,  # optional
             styles={
-                "container": {"padding": "0!important", "background-color": "#ffefd6"},
-                "icon": {"color": "#0e5e6f", "font-size": "18px"},
+                "container": {"padding": "0!important", "background-color": "#FFFFFF"},
+                "icon": {"color": "#42B781", "font-size": "18px"},
                 "nav-link": {
                     "font-size": "18px",
                     "text-align": "left",
                     "margin": "0px",
-                    "--hover-color": "#0e5e6f",
-                    "font-family": "Candara"
+                    "--hover-color": "#A4D2C1",
+                    "font-family": "Candara",
                 },
-                "nav-link-selected": {"background-color": "#3a8891"},
+                "nav-link-selected": {"background-color": "#519079"},
                 },
             )
 
