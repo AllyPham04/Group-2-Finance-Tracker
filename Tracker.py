@@ -13,7 +13,7 @@ def track():
     local_css('style.css')
     background()
     st.title("Tracker")
-    col_a1, col_a2, col_a3 = st.columns([1, 1, 2])
+    col_a1, col_a2, col_a3 = st.columns([1, 2, 2])
     #st.divider()
     col_b1, col_b2 = st.columns(2)
 
@@ -64,7 +64,7 @@ def track():
                 st.subheader("Transaction")
                 selected_date = st.date_input("Select date:", value=now_vn.date(), format="DD/MM/YYYY")
                 amount = st.number_input(f"Amount:", min_value=0, format="%i", step=10)
-                category = st.selectbox("Category:", incomes)
+                category = st.selectbox("Category:", expenses)
                 if st.form_submit_button("Save Data"):
                     # Gather user inputs
                     user_data = {
@@ -90,7 +90,8 @@ def track():
         st.write('')
         st.write('')
         st.write('')
-        with st.form("transactions_history", clear_on_submit=True):
+        st.write('')
+        with st.container():
             st.subheader("History")
             if os.path.exists('data.csv'):
                 history_df = pd.read_csv('data.csv')
@@ -116,11 +117,14 @@ def track():
                 monthly_df = monthly_df[(monthly_df['Date'] >= first_day_of_month) & (monthly_df['Date'] <= last_day_of_month)]
 
                 history_df.index = history_df.index + 1
-                history_df['Amount'] = history_df.apply(lambda row: f'+ {currency} {row["Amount"]}' 
-                                        if row['Type'] == 'Income' 
-                                        else f'- {currency} {row["Amount"]}', axis=1)
 
-                st.dataframe(history_df.drop(columns='Type'), use_container_width=True)
+                out_df = history_df.copy()
+
+                out_df['Amount'] = out_df.apply(lambda row: f'+ {row["Amount"]} {currency} ' 
+                                        if row['Type'] == 'Income' 
+                                        else f'- {row["Amount"]} {currency}', axis=1)
+
+                st.dataframe(out_df.drop(columns='Type'), use_container_width=True)
 
 
             if os.path.exists('budget.csv') and os.path.exists('data.csv'):
@@ -135,13 +139,18 @@ def track():
                                 st.session_state[f'warning_{expense}'] = True
             else:
                 pass
-            if st.form_submit_button("Clear all data"):
-                st.session_state.clear()
-                if os.path.exists('data.csv'):
-                    os.remove('data.csv')
-                    st.success("Data cleared!")
-                user_income.clear()
-                user_expense.clear()
+            if st.button("Edit data"):
+                if history_df.empty:
+                    st.warning('No data found.')
+                else:
+                    delete_row = st.number_input('Enter the row you want to delete:', min_value=1, max_value=len(history_df), step=1)
+                    delete_data = st.button('Delete')
+                    if delete_data:
+                        edit_df = history_df.drop(history_df.index[delete_row])
+                        edit_df = edit_df.reset_index(drop=True)
+                        edit_df.to_csv('data.csv', index=False, date_format="%d-%m-%Y")
+                        st.success("Data deleted!")
+                
     st.session_state['previous_total_balance'] = total_balance
 
     delta_balance = total_balance - previous_total_balance
