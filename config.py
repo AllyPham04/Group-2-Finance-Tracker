@@ -23,7 +23,7 @@ def local_css(file_name):#func to read css file -> create flake
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 def background_about_us():
-    bg_img = get_img_as_base64("bg_2.png")
+    bg_img = get_img_as_base64("bg_1.png")
     page_bg_img = f"""
     <style>
     [data-testid="stAppViewContainer"] > .main {{
@@ -38,7 +38,7 @@ def background_about_us():
     st.markdown(page_bg_img, unsafe_allow_html=True)
 
 def background():
-    bg_img = get_img_as_base64("bg_3.png")
+    bg_img = get_img_as_base64("bg_2.png")
     page_bg_img = f"""
     <style>
     [data-testid="stAppViewContainer"] > .main {{
