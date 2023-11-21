@@ -235,7 +235,7 @@ def home():
 
         util_exp = float(monthly_df[monthly_df['Category'] == 'Utilities']['Amount'].sum())
 
-        income_month = float(monthly_df[monthly_df['Type']=='Income']['Amount'].sum())
+        income_month = float(monthly_df[monthly_df['Type'] == 'Income']['Amount'].sum())
 
         #Nhiem vu 2: Necessity account
         if st.checkbox('Necessity account'):
