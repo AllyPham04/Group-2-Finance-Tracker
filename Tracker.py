@@ -139,18 +139,19 @@ def track():
                                 st.session_state[f'warning_{expense}'] = True
             else:
                 pass
-            if st.button("Edit data"):
-                if history_df.empty:
-                    st.warning('No data found.')
-                else:
-                    delete_row = st.number_input('Enter the row you want to delete:', min_value=1, max_value=len(history_df), step=1)
-                    delete_data = st.button('Delete')
-                    if delete_data:
-                        edit_df = history_df.drop(history_df.index[delete_row])
-                        edit_df = edit_df.reset_index(drop=True)
-                        edit_df.to_csv('data.csv', index=False, date_format="%d-%m-%Y")
-                        st.success("Data deleted!")
-                
+
+            if history_df.empty:
+                st.warning('No data found.')
+            else:
+                delete_row = st.number_input('Enter the row you want to delete:', min_value=1, max_value=len(history_df), step=1)
+                if st.button('Delete'):
+                    # Use boolean indexing to filter out the selected row
+                    edit_df = history_df[history_df.index != delete_row]  # Subtract 1 because row numbers start from 1
+                    edit_df = edit_df.reset_index(drop=True)
+                    edit_df.to_csv('data.csv', index=False, date_format="%d-%m-%Y")
+                    st.success('Row deleted')
+                    st.experimental_rerun()
+
     st.session_state['previous_total_balance'] = total_balance
 
     delta_balance = total_balance - previous_total_balance
@@ -168,9 +169,7 @@ def track():
 
         if col_a2_1.button("Save"):
             col_a2_1.write(f'Your saving goal is {saving_goal} {currency}')
-            if saving_goal == 0:
-                st.error("You haven't set you saving goal!")
-            elif total_saving >= saving_goal and saving_goal > 0:
+            if total_saving >= saving_goal:
                 st.success("Congratulations! You have reached your saving goal!")
             elif total_saving == 0:
                 st.warning("You have not saved anything yet!")
