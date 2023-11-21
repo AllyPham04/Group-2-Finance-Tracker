@@ -1,23 +1,25 @@
 import streamlit as st
 import os
+import calendar
 import pandas as pd
 import plotly.express as px
-import pytz
 from config import *
 from datetime import datetime
 from millify import millify
 
 
 def track():
-    local_css('style.css')
-    background()
     st.title("Tracker")
-    col_a1, col_a2, col_a3 = st.columns([1, 1, 2])
+    col_a1, col_a2, col_a3 = st.columns([0.2, 0.4, 0.4], gap='small')
     #st.divider()
     col_b1, col_b2 = st.columns(2)
 
     now = datetime.now()
-    now_vn = now.astimezone(pytz.timezone('Asia/Ho_Chi_Minh'))
+
+    _, last_day = calendar.monthrange(now.year, now.month)
+
+    first_day_of_month = datetime(now.year, now.month, 1).date()
+    last_day_of_month = datetime(now.year, now.month, last_day).date()
 
     total_income = 0
     total_expense = 0
@@ -33,7 +35,7 @@ def track():
         with tab1:
             with st.form("income", clear_on_submit=True):
                 st.subheader("Transaction")
-                selected_date = st.date_input("Select date:", value=now_vn.date(), format="DD/MM/YYYY")
+                selected_date = st.date_input("Select date:", value=now.date(), format="DD/MM/YYYY")
                 amount = st.number_input(f"Amount:", min_value=0, format="%i", step=10)
                 category = st.selectbox("Category:", incomes)
                 if st.form_submit_button("Save Data"):
@@ -47,10 +49,8 @@ def track():
 
                     try:
                         history_df = pd.read_csv('data.csv')
-                        #budget_df = pd.read_csv('budget.csv')
                     except (FileNotFoundError, pd.errors.EmptyDataError):
                         history_df = pd.DataFrame(columns=user_data.keys())
-                        #budget_df = pd.DataFrame(columns=['Type', 'Category', 'Budget'])
 
                     history_df = pd.concat([pd.DataFrame(user_data, index=[0]), history_df], ignore_index=True)
                     history_df['Date'] = pd.to_datetime(history_df['Date'], format="%d-%m-%Y")
@@ -62,7 +62,7 @@ def track():
         with tab2:
             with st.form("expense", clear_on_submit=True):
                 st.subheader("Transaction")
-                selected_date = st.date_input("Select date:", value=now_vn.date(), format="DD/MM/YYYY")
+                selected_date = st.date_input("Select date:", value=now.date(), format="DD/MM/YYYY")
                 amount = st.number_input(f"Amount:", min_value=0, format="%i", step=10)
                 category = st.selectbox("Category:", expenses)
                 if st.form_submit_button("Save Data"):
@@ -90,55 +90,60 @@ def track():
         st.write('')
         st.write('')
         st.write('')
-        with st.form("transactions_history", clear_on_submit=True):
+        st.write('')
+        with st.container():
             st.subheader("History")
             if os.path.exists('data.csv'):
-                history_df = pd.read_csv('data.csv', parse_dates=True, dayfirst=True)
+                history_df = pd.read_csv('data.csv')
+                col3_df = history_df.copy()
                 total_income = history_df[history_df['Type'] == 'Income']['Amount'].sum()
                 total_expense = history_df[history_df['Type'] == 'Expense']['Amount'].sum()
                 total_balance = total_income - total_expense
                 total_saving = history_df[(history_df['Type'] == 'Income') & (history_df['Category'] == 'Saving')]['Amount'].sum()
             else:
-                history_df = pd.DataFrame()
+                history_df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount'])
+                col3_df = history_df.copy()
                 total_balance = 0
                 total_saving = 0
 
             if not history_df.empty:
-                copyhistory_df = history_df.copy()
-                #------------
-                col3_df = history_df.copy()
-                col3_df['Amount'] = history_df.apply(lambda row: row['Amount']
-                if row['Type'] == 'Income'
-                else row['Amount'] * -1, axis=1)
-                #------------
+                col3_df['Amount'] = col3_df.apply(lambda row: row['Amount']
+                                                    if row['Type'] == 'Income'
+                                                    else row['Amount'] * -1, axis=1)
+
+
+                monthly_df = history_df.copy() #monthly_data
+                monthly_df['Date'] = pd.to_datetime(monthly_df['Date'], dayfirst=True).dt.date
+                monthly_df = monthly_df[(monthly_df['Date'] >= first_day_of_month) & (monthly_df['Date'] <= last_day_of_month)]
+
                 history_df.index = history_df.index + 1
-                history_df['Amount'] = history_df.apply(lambda row: f'+ {row["Amount"]} {currency}'
-                if row['Type'] == 'Income'
-                else f'- {row["Amount"]} {currency}', axis=1)
-                #history_df['Month'] = history_df['Date'].dt.strftime("%m")
-                history_container = st.dataframe(history_df.drop(columns='Type'), use_container_width=True)
+                history_df['Amount'] = history_df.apply(lambda row: f'+ {currency} {row["Amount"]}' 
+                                        if row['Type'] == 'Income' 
+                                        else f'- {currency} {row["Amount"]}', axis=1)
 
-
+                st.dataframe(history_df.drop(columns='Type'), use_container_width=True)
+            
+            
             if os.path.exists('budget.csv') and os.path.exists('data.csv'):
                 budget_df = pd.read_csv('budget.csv')
                 for expense in expenses:
                     if expense in budget_df['Category'].values:
                         budget_expense = float(budget_df[budget_df['Category'] == expense]['Budget'].values[0])
-                        expense_cate = float(copyhistory_df[(copyhistory_df['Type'] == 'Expense') & (copyhistory_df['Category'] == expense)]['Amount'].sum())
+                        expense_cate = float(monthly_df[(monthly_df['Type'] == 'Expense') & (monthly_df['Category'] == expense)]['Amount'].sum())
                         if expense_cate > 0.9 * budget_expense:
                             if not st.session_state.get(f'warning_{expense}', False):
-                                st.warning(f"You have spent over 90% of your budget for {expense} category")
+                                st.warning(f"You have spent over 90% of your budget for {expense} category in {calendar.month_name[now.month]}")
                                 st.session_state[f'warning_{expense}'] = True
             else:
                 pass
-
-            if st.form_submit_button("Clear all data"):
-                st.session_state.clear()
-                if os.path.exists('data.csv'):
-                    os.remove('data.csv')
-                    st.success("Data cleared!")
-                user_income.clear()
-                user_expense.clear()
+            #edit_button = st.button('Edit Data')
+            #if edit_button:
+                #st.session_state.clear()
+                #if os.path.exists('data.csv'):
+                    #os.remove('data.csv')
+                    #st.success("Data cleared!")
+                #user_income.clear()
+                #user_expense.clear()
     st.session_state['previous_total_balance'] = total_balance
 
     delta_balance = total_balance - previous_total_balance
@@ -156,8 +161,6 @@ def track():
 
         saving_goal = col_a2_1.number_input("Enter your saving goal:", min_value=0, format="%i", step=10)
 
-        progress = total_saving / saving_goal if saving_goal > 0 else 0
-
         if col_a2_1.button("Save"):
             col_a2_1.write(f'Your saving goal is {saving_goal} {currency}')
             if total_saving >= saving_goal:
@@ -172,7 +175,9 @@ def track():
 
     with col_a3:
         st.subheader(f'Your balance in {datetime.now().year}')
+
         visual_df = col3_df.copy()
+        
         visual_df['Date'] = pd.to_datetime(visual_df['Date'], format='%d-%m-%Y')
         visual_df['Month'] = visual_df['Date'].dt.strftime('%b')
 
@@ -197,4 +202,3 @@ def track():
         )
         visual.update_layout(height=300, xaxis_title='Month', yaxis_title='Total Amount')
         st.plotly_chart(visual, use_container_width=True)
-
