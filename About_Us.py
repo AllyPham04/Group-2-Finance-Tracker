@@ -102,7 +102,7 @@ def info():
         with intro:
             st.subheader("Introduction")
             st.markdown(f"""<p style='text-align: justify; font-family: {fontFamily};'>
-                                Welcome to the {app_name}. 
+                                Welcome to the {app_name}! 
                                 Where managing your finances becomes seamless and insightful.
                                 Start your financial journey by recording transactions, 
                                 setting goals, and gaining valuable insights into your spending habits. 
