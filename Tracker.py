@@ -187,11 +187,14 @@ def track():
 
         # Group by month and sum 'Amount' for each group
         grouped_data = visual_df.groupby('Month')['Amount'].sum().reset_index()
+
         # Create a DataFrame with all months in the desired range
         all_months = pd.date_range(start=f'{datetime.now().year}-01-01', end=f'{datetime.now().year}-12-31', freq='M')
         all_months_df = pd.DataFrame({'Date': all_months, 'Amount': 0})
+
         # Convert the 'Date' column to month names in all_months_df
         all_months_df['Month'] = all_months_df['Date'].dt.strftime('%b')
+        
         # Merge the two DataFrames, filling missing values with 0
         result_df = pd.merge(all_months_df, grouped_data, on='Month', how='left').fillna(0)
         visual = px.line(
