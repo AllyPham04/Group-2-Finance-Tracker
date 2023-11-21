@@ -33,7 +33,6 @@ def home():
         df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount'])
 
     display = st.columns([3, 1])
-    display[1].header("Mission")
     display_r1 = display[0].columns(4)
 
     if os.path.exists('data.csv'):
