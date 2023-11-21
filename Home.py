@@ -35,6 +35,7 @@ def home():
     display_r1 = display[0].columns(4)
 
     if os.path.exists('data.csv'):
+        df['Date'] = pd.to_datetime(df['Date'], format="%d-%m-%Y")
         df['Date'] = df['Date'].dt.date
         total_income = df[df['Type'] == 'Income']['Amount'].sum()
         total_expense = df[df['Type'] == 'Expense']['Amount'].sum()
