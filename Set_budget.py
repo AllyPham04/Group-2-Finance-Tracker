@@ -8,7 +8,7 @@ def budget():
     background()
     st.title("Set Budget")
 
-    col1, col2 = st.columns(2, gap="large")
+    col1, col2 = st.columns(2)
     with col1:
         st.subheader("Set Budget")
         for category in expenses:
