@@ -57,7 +57,6 @@ def budget():
             clear_data = st.button("Clear All Data")
 
             if clear_data:
-                st.session_state.clear()
                 if os.path.exists("budget.csv"):
                     os.remove("budget.csv")
                     st.success("All data cleared!")
