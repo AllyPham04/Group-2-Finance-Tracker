@@ -49,7 +49,7 @@ def budget():
             try:
                 budget_df = pd.read_csv('budget.csv')
                 budget_df.index = budget_df.index + 1
-                st.dataframe(budget_df[budget_df['Type'] == 'Expense'])
+                st.dataframe(budget_df[budget_df['Type'] == 'Expense'], use_container_width=True)
             except (FileNotFoundError, pd.errors.EmptyDataError):
                 budget_df = pd.DataFrame(columns=['Type', 'Category', 'Budget'])
                 st.warning("No budget data found")
