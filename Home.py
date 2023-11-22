@@ -2,8 +2,9 @@ import streamlit as st
 import pandas as pd
 import os
 import plotly.express as px
-import matplotlib.pyplot as plt
 import calendar
+import json
+import pytz
 from millify import millify
 from datetime import timedelta
 from datetime import datetime
@@ -26,14 +27,17 @@ def home():
     st.markdown(container_style, unsafe_allow_html=True)
     st.title(page_title + " " + page_icon)
 
+    #Read file data.csv
     try:
         df = pd.read_csv('data.csv', parse_dates=['Date'], dayfirst=True)
     except (FileNotFoundError, pd.errors.EmptyDataError):
         df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount'])
 
+    #Divide the screen into columns
     display = st.columns([3, 1])
     display_r1 = display[0].columns(4)
 
+    #Calculate total income, expense, balance, and saving
     if os.path.exists('data.csv'):
         df['Date'] = pd.to_datetime(df['Date'], format="%d-%m-%Y")
         df['Date'] = df['Date'].dt.date
@@ -47,43 +51,47 @@ def home():
         total_balance = 0
         total_saving = 0
 
+    #Total balance
     with display_r1[0]:
         total_balance_millified = millify(total_balance, precision=2)
         with st.container():
             st.subheader("Total Credits") 
             st.metric('Balance', f"{total_balance_millified} {currency}")
 
+    #Total income
     with display_r1[1]:
         total_income_millified = millify(total_income, precision=2)
         with st.container():
             st.subheader("Total Income") 
             st.metric('Income', f"{total_income_millified} {currency}")
 
+    #Total expense
     with display_r1[2]:
         total_expense_millified = millify(total_expense, precision=2)
         with st.container():
             st.subheader("Total Expense") 
             st.metric('Expense', f"{total_expense_millified} {currency}")
 
+    #Total saving
     with display_r1[3]:
         total_saving_millified = millify(total_saving, precision=2)
         with st.container():
             st.subheader("Total Saving") 
             st.metric('Saving', f"{total_saving_millified} {currency}")
 
+    #Create 2 buttons ('Next Week' and 'Last Week')
     button_left = display_r1[0].button("Next Week")
     button_right = display_r1[1].button("Last Week")
     current_date = datetime.now()
 
+    #Start Date of the week
     if 'start_date' not in st.session_state:
         st.session_state['start_date'] = current_date - timedelta(days=(current_date.weekday() - 0) % 7)
         st.session_state['start_date'] = st.session_state['start_date'].date()
 
-    if 'weekly_data' not in st.session_state:
-        st.session_state['weekly_data'] = pd.DataFrame()
-        weekly_data = st.session_state['weekly_data']
-
     displayr2 = display[0].columns([2, 1])
+
+    #Weekly Chart
     with displayr2[0]:
         st.write('')
         st.write('')
@@ -91,50 +99,66 @@ def home():
         with st.container():
             st.subheader("Weekly Chart")
             
+            #2 types of chart: Line chart and Bar chart
             home_chart = st.selectbox('Chart', ['Bar Chart', 'Line Chart'])
+
+            #move to next week
             if button_left:
                 st.session_state['start_date'] += timedelta(weeks=1)
             
+            #move to last week
             if button_right:
                 st.session_state['start_date'] -= timedelta(weeks=1)
 
+            #Date of the week
             date_range = pd.date_range(start=st.session_state['start_date'], periods=7)
+
+            #Data of the chosen week
             weekly_data = df[(df['Date'] >= st.session_state['start_date']) & (df['Date'] < st.session_state['start_date'] + timedelta(weeks=1))]
             
+            #Create a df of date of the week
             all_days_data = pd.DataFrame({'Date': date_range})
             all_days_data['Date'] = pd.to_datetime(all_days_data['Date']).dt.date
 
+            #Tổng amount của các data theo ngày và theo type trong tuần
             df_resampled = weekly_data.groupby(['Date', 'Type'])['Amount'].sum()
             df_resampled = df_resampled.reset_index()
             df_resampled['Type'] = pd.Categorical(df_resampled['Type'], categories=['Income', 'Expense'], ordered=True)
                 
             all_days_data = pd.MultiIndex.from_product([all_days_data['Date'], ['Income', 'Expense']], names=['Date', 'Type']).to_frame(index=False)
             
+            #Merge 2 df dựa theo cột Date và Type
             df_resampled = pd.merge(all_days_data, df_resampled, on=['Date', 'Type'], how='left', sort=True)
 
+            #Trong cột Amount, cột nào chưa có giá trị thì điền 0
             df_resampled['Amount'].fillna(0, inplace=True)
             
+            #Hiện Bar chart
             if home_chart == 'Bar Chart':
                 visual_bar = px.bar(df_resampled, x="Date", y="Amount", color="Type", barmode="group")
                 st.plotly_chart(visual_bar, use_container_width=True)
             
+            #Hiện Line chart
             elif home_chart == 'Line Chart':
                 visual_line = px.line(df_resampled, x="Date", y="Amount", color="Type")
                 st.plotly_chart(visual_line, use_container_width=True)
-
+    
+    #Pie chart of All Income and Expense
     with displayr2[1]:
         with st.container():
             all_income, all_expenses = st.tabs(["Income", "Expense"])
             with all_expenses:
                 st.subheader("All Expense")
 
+                #Lấy data trong tuần với cột Type là Expense
                 weekly_expenses = weekly_data[weekly_data['Type'] == 'Expense']
                 
                 st.write('')
                 st.write('')
                 st.write('')
                 st.write('')
-                #all_days_data = pd.DataFrame({'Date': date_range})
+                
+                #Nếu data rỗng thì hiện cảnh báo, không thì hiện chart
                 if not weekly_expenses.empty:
                     expenses_by_category = weekly_expenses.groupby('Category')['Amount'].sum().reset_index()
 
@@ -145,12 +169,16 @@ def home():
             
             with all_income:
                 st.subheader("All Income")
+
+                #Lấy data trong tuần với cột Type là Expense
                 weekly_income = weekly_data[weekly_data['Type'] == 'Income']
 
                 st.write('')
                 st.write('')
                 st.write('')
                 st.write('')
+
+                #Nếu data rỗng thì hiện cảnh báo, không thì hiện chart
                 if not weekly_income.empty:
                     income_by_category = weekly_income.groupby('Category')['Amount'].sum().reset_index()
 
@@ -159,6 +187,7 @@ def home():
                 else:
                     st.warning("No income data available for the selected week.")
 
+    #Goal Tracking
     with display[1]:
         st.subheader('Goal Tracking')
 
@@ -172,9 +201,15 @@ def home():
         # Hiển thị danh sách các mission
         st.markdown("Choose financial goals that you've achieved:")
 
+        #tạo file chứa các achievement để nó luôn hiện khi reload page
         if 'earned_achievement' not in st.session_state:
-            st.session_state['earned_achievement'] = set()
+            try:
+                with open('achievements.json', 'r') as f:
+                    st.session_state['earned_achievement'] = set(json.load(f))
+            except FileNotFoundError:
+                st.session_state['earned_achievement'] = set()
 
+        #tạo file daily_login chứa thời gian lần cuối click chuột và đếm số lần click
         if os.path.exists('daily_login.txt'):
             with open('daily_login.txt', 'r') as f:
                 lines = f.readlines()
@@ -185,11 +220,14 @@ def home():
             current_streak = 0
 
         now = datetime.now()
+        now_vn = now.astimezone(pytz.timezone('Asia/Ho_Chi_Minh'))
+        
+        #Xác định ngày đầu và ngày cuối của tháng
+        first_day_of_month = datetime(now_vn.year, now_vn.month, 1).date()
+        _, last_day = calendar.monthrange(now_vn.year, now_vn.month)
+        last_day_of_month = datetime(now_vn.year, now_vn.month, last_day).date()
 
-        first_day_of_month = datetime(now.year,now.month,1).date()
-        _, last_day = calendar.monthrange(now.year,now.month)
-        last_day_of_month = datetime(now.year,now.month,last_day).date()
-
+        #Tạo df của tháng hiện tại
         monthly_df = df.copy()
 
         monthly_df = monthly_df[(monthly_df['Date'] >= first_day_of_month) & (monthly_df['Date'] <= last_day_of_month)]
@@ -199,6 +237,7 @@ def home():
         #In ra data theo tháng hiện tại mà đã nhóm vào từng Category
         monthly_df = monthly_df.groupby(['Type', 'Category'])['Amount'].sum().reset_index()
 
+        #Tạo df của ngày hiện tại
         today = now.date()
         today_df = today_df[today_df['Date'] == today]
 
@@ -222,10 +261,13 @@ def home():
                 with open('daily_login.txt', 'w') as f:
                     f.write(str(today) + '\n')  # Save the date when the checkbox was clicked
                     f.write(str(current_streak))
+
             if current_streak >= 10:
                 st.success('Congratulations! You have earned the "Loyal User" achievement.')
-                mis1 = f'{calendar.month_name[now.month]}/{now.year} - Loyal User'
+                mis1 = f'{calendar.month_name[now_vn.month]} / {now_vn.year} - Loyal User'
                 st.session_state['earned_achievement'].add(mis1)
+                with open('achievements.json', 'w') as f:
+                    json.dump(list(st.session_state['earned_achievement']), f)
             
         food_expenses = float(monthly_df[monthly_df['Category'] == 'Food']['Amount'].sum())
 
@@ -239,17 +281,19 @@ def home():
 
         #Nhiem vu 2: Necessity account
         if st.checkbox('Necessity account'):
-            mis2 = f'{calendar.month_name[now.month]}/{now.year} - Essential Saver'
+            mis2 = f'{calendar.month_name[now_vn.month]} / {now_vn.year} - Essential Saver'
             st.write('Your monthly expense (food, transportation, etc.) is no larger than 55% of your income.')
 
-            if not 0 < (food_expenses + clothes_expense + util_exp + trans_exp) <= (0.55)*income_month:
+            if not 0 < (food_expenses + clothes_expense + util_exp + trans_exp) <= 0.55 * income_month:
                 st.error('You haven\'t achieved this goal! Keep working!')
                 if mis2 in st.session_state['earned_achievement']:
                     st.session_state['earned_achievement'].remove(mis2)
 
-            elif 0 < (food_expenses + clothes_expense + util_exp + trans_exp) <= (0.55)*income_month:
+            elif 0 < (food_expenses + clothes_expense + util_exp + trans_exp) <= 0.55 * income_month:
                 st.success('Congratulations! You have earned the "Essential Saver" achievement.')
                 st.session_state['earned_achievement'].add(mis2)
+                with open('achievements.json', 'w') as f:
+                    json.dump(list(st.session_state['earned_achievement']), f)
 
 
         #Nhiem vu 3: Financial freedom account
@@ -257,24 +301,26 @@ def home():
         invest_exp = float(monthly_df[monthly_df['Category'] == 'Investment']['Amount'].sum())
 
         if st.checkbox("Financial freedom account"):
-            mis3 = f'{calendar.month_name[now.month]}/{now.year} - Investor\'s Edge'
+            mis3 = f'{calendar.month_name[now_vn.month]} / {now_vn.year} - Investor\'s Edge'
             st.write('Your expense for investment is about 10% of your income.')
 
-            if not 0 < invest_exp <= income_month*0.1:
+            if not 0 < invest_exp <= income_month * 0.1:
                 st.error('You haven\'t achieved this goal! Keep working!')
                 if mis3 in st.session_state['earned_achievement']:
                     st.session_state['earned_achievement'].remove(mis3)
 
-            elif 0 < invest_exp <= income_month*0.1:
+            elif 0 < invest_exp <= income_month * 0.1:
                 st.success('Congratulations! You have earned the "Investor\'s Edge" achievement.')
                 st.session_state['earned_achievement'].add(mis3)
+                with open('achievements.json', 'w') as f:
+                    json.dump(list(st.session_state['earned_achievement']), f)
                 
         #Nhiem vu 4: Education account
 
-        edu_exp = float(monthly_df[monthly_df['Category']=='Education']['Amount'].sum())
+        edu_exp = float(monthly_df[monthly_df['Category'] == 'Education']['Amount'].sum())
 
         if st.checkbox("Education account"):
-            mis4 = f'{calendar.month_name[now.month]}/{now.year} - Academic Aces'
+            mis4 = f'{calendar.month_name[now_vn.month]} / {now_vn.year} - Academic Aces'
             st.write('Your expense for education is about 10% of your income.')
                 
             if not 0 < edu_exp <= 0.1 * income_month:
@@ -284,6 +330,8 @@ def home():
             elif 0 < edu_exp <= 0.1 * income_month:
                 st.success('Congratulations! You have earned the "Academic Aces" achievement.')
                 st.session_state['earned_achievement'].add(mis4)
+                with open('achievements.json', 'w') as f:
+                    json.dump(list(st.session_state['earned_achievement']), f)
 
                 
         #Nhiem vu 5: Long-term saving
@@ -291,17 +339,19 @@ def home():
         saving_exp = float(monthly_df[monthly_df['Category'] == 'Saving']['Amount'].sum())
 
         if st.checkbox("Long-term saving for spending account"):
-            mis5 = f'{calendar.month_name[now.month]}/{now.year} - Future Fortune Fund'
+            mis5 = f'{calendar.month_name[now_vn.month]} / {now_vn.year} - Future Fortune Fund'
             st.write('Your saving is about 10% of your income.')
                 
-            if not 0 < saving_exp <= 0.1*income_month:
+            if not 0 < saving_exp <= 0.1 * income_month:
                 st.error('You haven\'t achieved this goal! Keep working!')
                 if mis5 in st.session_state['earned_achievement']:
                     st.session_state['earned_achievement'].remove(mis5)
 
-            elif 0 < saving_exp <= 0.1*income_month:
+            elif 0 < saving_exp <= 0.1 * income_month:
                 st.success('Congratulations! You have earned the "Future Fortune Fund" achievement.')
                 st.session_state['earned_achievement'].add(mis5)
+                with open('achievements.json', 'w') as f:
+                    json.dump(list(st.session_state['earned_achievement']), f)
         
         st.subheader('Achievement')
         for achievement in st.session_state['earned_achievement']:
