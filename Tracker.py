@@ -13,23 +13,29 @@ def track():
     local_css('style.css')
     background()
     st.title("Tracker")
+
+    #Divide screen into columns
     col_a1, col_a2, col_a3 = st.columns([1, 2, 2])
-    #st.divider()
     col_b1, col_b2 = st.columns(2)
 
     now = datetime.now()
     now_vn = now.astimezone(pytz.timezone('Asia/Ho_Chi_Minh'))
 
-    _, last_day = calendar.monthrange(now.year, now.month)
+    #Xác định ngày đầu và cuối của tháng hiện tại
+    _, last_day = calendar.monthrange(now_vn.year, now_vn.month)
 
-    first_day_of_month = datetime(now.year, now.month, 1).date()
-    last_day_of_month = datetime(now.year, now.month, last_day).date()
+    first_day_of_month = datetime(now_vn.year, now_vn.month, 1).date()
+    last_day_of_month = datetime(now_vn.year, now_vn.month, last_day).date()
 
     total_income = 0
     total_expense = 0
+
+    #Tính số dư trước đấy
     if 'previous_total_balance' not in st.session_state:
         st.session_state['previous_total_balance'] = 0
     previous_total_balance = st.session_state['previous_total_balance']
+
+    #Nhập vào chi tiêu cá nhân
     with col_b1:
         tab1, tab2 = st.tabs(["Income", "Expense"])
         with tab1:
@@ -49,10 +55,8 @@ def track():
 
                     try:
                         history_df = pd.read_csv('data.csv')
-                        #budget_df = pd.read_csv('budget.csv')
                     except (FileNotFoundError, pd.errors.EmptyDataError):
                         history_df = pd.DataFrame(columns=user_data.keys())
-                        #budget_df = pd.DataFrame(columns=['Type', 'Category', 'Budget'])
 
                     history_df = pd.concat([pd.DataFrame(user_data, index=[0]), history_df], ignore_index=True)
                     history_df['Date'] = pd.to_datetime(history_df['Date'], format="%d-%m-%Y")
@@ -76,16 +80,16 @@ def track():
 
                     try:
                         history_df = pd.read_csv('data.csv')
-                        #budget_df = pd.read_csv('budget.csv')
                     except (FileNotFoundError, pd.errors.EmptyDataError):
                         history_df = pd.DataFrame(columns=user_data.keys())
-                        #budget_df = pd.DataFrame(columns=['Type', 'Category', 'Budget'])
 
                     history_df = pd.concat([pd.DataFrame(user_data, index=[0]), history_df], ignore_index=True)
                     history_df['Date'] = pd.to_datetime(history_df['Date'], format="%d-%m-%Y")
                     history_df = history_df.sort_values(by=['Date'], ascending=False)
                     history_df.to_csv('data.csv', index=False, date_format="%d-%m-%Y")
                     st.success("Data saved!")
+
+    #Hiện những chi tiêu người dùng đã nhập             
     with col_b2:
         st.write('')
         st.write('')
@@ -96,9 +100,17 @@ def track():
             if os.path.exists('data.csv'):
                 history_df = pd.read_csv('data.csv')
                 col3_df = history_df.copy()
+
+                #Total income
                 total_income = history_df[history_df['Type'] == 'Income']['Amount'].sum()
+                
+                #Total expense
                 total_expense = history_df[history_df['Type'] == 'Expense']['Amount'].sum()
+                
+                #Total balance
                 total_balance = total_income - total_expense
+
+                #Total saving
                 total_saving = history_df[(history_df['Type'] == 'Income') & (history_df['Category'] == 'Saving')]['Amount'].sum()
             else:
                 history_df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount'])
@@ -126,7 +138,7 @@ def track():
 
                 st.dataframe(out_df.drop(columns='Type'), use_container_width=True)
 
-
+            #Hiện cảnh báo nếu người dùng chi tiêu vượt quá budget cho từng category
             if os.path.exists('budget.csv') and os.path.exists('data.csv'):
                 budget_df = pd.read_csv('budget.csv')
                 for expense in expenses:
@@ -139,7 +151,8 @@ def track():
                                 st.session_state[f'warning_{expense}'] = True
             else:
                 pass
-
+            
+            #Người dùng có thể xóa đi data mà mình nhập sai
             if history_df.empty:
                 st.warning('No data found.')
             else:
@@ -154,19 +167,25 @@ def track():
 
     st.session_state['previous_total_balance'] = total_balance
 
+    #Phần chênh lệch giữa số dư mới và số dư cũ
     delta_balance = total_balance - previous_total_balance
     delta_balance_millified = millify(delta_balance, precision=2)
+
+    #Total balance
     with col_a1:
         total_balance_millified = millify(total_balance, precision=2)
         with st.container():
             st.subheader("Total Credits")
             st.metric('Balance', f"{total_balance_millified} {currency}", delta=f"{delta_balance_millified} {currency}", delta_color="normal")
+    
+    #Set the saving goal
     with col_a2:
         col_a2_1, col_a2_2 = st.columns(2)
         col_a2_1.subheader("Saving Goal")
 
         saving_goal = col_a2_1.number_input("Enter your saving goal:", min_value=0, format="%i", step=10)
 
+        #Hiện pie chart theo dõi quá trình tiết kiệm
         if col_a2_1.button("Save"):
             col_a2_1.write(f'Your saving goal is {saving_goal} {currency}')
             if total_saving >= saving_goal:
@@ -179,6 +198,7 @@ def track():
                                     title=f'Saving Progress')
                 col_a2_2.plotly_chart(fig_saving, use_container_width=True)
 
+    #Line chart thể hiện số dư từng tháng trong năm hiện tại
     with col_a3:
         st.subheader(f'Your balance in {datetime.now().year}')
         visual_df = col3_df.copy()
