@@ -3,8 +3,8 @@ import pandas as pd
 import os
 import plotly.express as px
 import calendar
-import json
 import pytz
+import sqlite3
 from millify import millify
 from datetime import timedelta
 from datetime import datetime
@@ -201,20 +201,37 @@ def home():
         # Hiển thị danh sách các mission
         st.markdown("Choose financial goals that you've achieved:")
 
+        # Connect to SQLite database
+        conn = sqlite3.connect('achievements.db')
+        c = conn.cursor()
+        
+        # Create table if not exists
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS achievements (
+                id INTEGER PRIMARY KEY,
+                achievement TEXT NOT NULL
+            );
+        ''')
+
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS daily_login (
+                id INTEGER PRIMARY KEY,
+                last_clicked_mis1 TEXT,
+                current_streak INTEGER
+            );
+        ''')
+
         #tạo file chứa các achievement để nó luôn hiện khi reload page
         if 'earned_achievement' not in st.session_state:
-            try:
-                with open('achievements.json', 'r') as f:
-                    st.session_state['earned_achievement'] = set(json.load(f))
-            except FileNotFoundError:
-                st.session_state['earned_achievement'] = set()
+            c.execute('SELECT achievement FROM achievements')
+            st.session_state['earned_achievement'] = set(row[0] for row in c.fetchall())
 
         #tạo file daily_login chứa thời gian lần cuối click chuột và đếm số lần click
-        if os.path.exists('daily_login.txt'):
-            with open('daily_login.txt', 'r') as f:
-                lines = f.readlines()
-                last_clicked_mis1 = datetime.strptime(lines[0].strip(), '%Y-%m-%d').date()
-                current_streak = int(lines[1])
+        c.execute('SELECT last_clicked_mis1, current_streak FROM daily_login ORDER BY id DESC LIMIT 1')
+        row = c.fetchone()
+        if row is not None:
+            last_clicked_mis1 = datetime.strptime(row[0], '%Y-%m-%d').date() if row[0] else None
+            current_streak = row[1]
         else:
             last_clicked_mis1 = None
             current_streak = 0
@@ -258,16 +275,18 @@ def home():
                 current_streak += 1
             else:
                 current_streak = 1
-                with open('daily_login.txt', 'w') as f:
-                    f.write(str(today) + '\n')  # Save the date when the checkbox was clicked
-                    f.write(str(current_streak))
+                
+            c.execute('INSERT INTO daily_login (last_clicked_mis1, current_streak) VALUES (?, ?)', (now_vn.strftime('%Y-%m-%d'), current_streak))
+            conn.commit()
 
             if current_streak >= 10:
                 st.success('Congratulations! You have earned the "Loyal User" achievement.')
                 mis1 = f'{calendar.month_name[now_vn.month]} / {now_vn.year} - Loyal User'
                 st.session_state['earned_achievement'].add(mis1)
-                with open('achievements.json', 'w') as f:
-                    json.dump(list(st.session_state['earned_achievement']), f)
+                c.execute('DELETE FROM achievements')
+                for achievement in st.session_state['earned_achievement']:
+                    c.execute('INSERT INTO achievements (achievement) VALUES (?)', (achievement,))
+                conn.commit()
             
         food_expenses = float(monthly_df[monthly_df['Category'] == 'Food']['Amount'].sum())
 
@@ -292,8 +311,10 @@ def home():
             elif 0 < (food_expenses + clothes_expense + util_exp + trans_exp) <= 0.55 * income_month:
                 st.success('Congratulations! You have earned the "Essential Saver" achievement.')
                 st.session_state['earned_achievement'].add(mis2)
-                with open('achievements.json', 'w') as f:
-                    json.dump(list(st.session_state['earned_achievement']), f)
+                c.execute('DELETE FROM achievements')
+                for achievement in st.session_state['earned_achievement']:
+                    c.execute('INSERT INTO achievements (achievement) VALUES (?)', (achievement,))
+                conn.commit()
 
 
         #Nhiem vu 3: Financial freedom account
@@ -312,8 +333,10 @@ def home():
             elif 0 < invest_exp <= income_month * 0.1:
                 st.success('Congratulations! You have earned the "Investor\'s Edge" achievement.')
                 st.session_state['earned_achievement'].add(mis3)
-                with open('achievements.json', 'w') as f:
-                    json.dump(list(st.session_state['earned_achievement']), f)
+                c.execute('DELETE FROM achievements')
+                for achievement in st.session_state['earned_achievement']:
+                    c.execute('INSERT INTO achievements (achievement) VALUES (?)', (achievement,))
+                conn.commit()
                 
         #Nhiem vu 4: Education account
 
@@ -330,8 +353,10 @@ def home():
             elif 0 < edu_exp <= 0.1 * income_month:
                 st.success('Congratulations! You have earned the "Academic Aces" achievement.')
                 st.session_state['earned_achievement'].add(mis4)
-                with open('achievements.json', 'w') as f:
-                    json.dump(list(st.session_state['earned_achievement']), f)
+                c.execute('DELETE FROM achievements')
+                for achievement in st.session_state['earned_achievement']:
+                    c.execute('INSERT INTO achievements (achievement) VALUES (?)', (achievement,))
+                conn.commit()
 
                 
         #Nhiem vu 5: Long-term saving
@@ -350,8 +375,10 @@ def home():
             elif 0 < saving_exp <= 0.1 * income_month:
                 st.success('Congratulations! You have earned the "Future Fortune Fund" achievement.')
                 st.session_state['earned_achievement'].add(mis5)
-                with open('achievements.json', 'w') as f:
-                    json.dump(list(st.session_state['earned_achievement']), f)
+                c.execute('DELETE FROM achievements')
+                for achievement in st.session_state['earned_achievement']:
+                    c.execute('INSERT INTO achievements (achievement) VALUES (?)', (achievement,))
+                conn.commit()
         
         st.subheader('Achievement')
         for achievement in st.session_state['earned_achievement']:
