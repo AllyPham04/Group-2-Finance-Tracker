@@ -29,9 +29,9 @@ def home():
 
     #Read file data.csv
     try:
-        df = pd.read_csv('data.csv', parse_dates=['Date'], dayfirst=True)
+        df = pd.read_csv('data.csv')
     except (FileNotFoundError, pd.errors.EmptyDataError):
-        df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount'])
+        df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount', 'Note'])
 
     #Divide the screen into columns
     display = st.columns([3, 1])
