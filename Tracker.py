@@ -44,7 +44,7 @@ def track():
                 selected_date = st.date_input("Select date:", value=now_vn.date(), format="DD/MM/YYYY")
                 amount = st.number_input(f"Amount:", min_value=0, format="%i", step=10)
                 category = st.selectbox("Category:", incomes)
-                description = st.text_input("Note:")
+                note = st.text_input("Note:")
                 if st.form_submit_button("Save Data"):
                     # Gather user inputs
                     user_data = {
@@ -52,7 +52,7 @@ def track():
                         'Date': selected_date.strftime("%d-%m-%Y"),
                         'Category': category,
                         'Amount': amount,
-                        'Note': description
+                        'Note': note
                     }
 
                     try:
@@ -71,7 +71,7 @@ def track():
                 selected_date = st.date_input("Select date:", value=now_vn.date(), format="DD/MM/YYYY")
                 amount = st.number_input(f"Amount:", min_value=0, format="%i", step=10)
                 category = st.selectbox("Category:", expenses)
-                description = st.text_input("Note:")
+                note = st.text_input("Note:")
                 if st.form_submit_button("Save Data"):
                     # Gather user inputs
                     user_data = {
@@ -79,7 +79,7 @@ def track():
                         'Date': selected_date.strftime("%d-%m-%Y"),
                         'Category': category,
                         'Amount': amount,
-                        'Note': description
+                        'Note': note
                     }
 
                     try:
