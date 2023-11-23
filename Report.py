@@ -19,7 +19,7 @@ def rep():
         file_path = 'data.csv'
         df = pd.read_csv(file_path, parse_dates=['Date'], dayfirst=True)
     except (FileNotFoundError, pd.errors.EmptyDataError):
-        df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount'])
+        df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount', 'Note'])
     # -----------------------------------------
 
     now = datetime.now()
