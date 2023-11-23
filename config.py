@@ -1,8 +1,8 @@
 import streamlit as st
 import base64
 
-incomes = ["Salary", "Saving", "Bonus", "Side Job", "Other Income"]
-expenses = ["Food", "Housing", "Entertainment", "Education", "Utilities", "Transportation", "Investment", "Other Expense"]
+incomes = ["Salary", "Saving", "Bonus", "Interest", "Side Job", "Tax refund", "Other"]
+expenses = ["Food", "Household", "Subscription", "Health", "Entertainment", "Education", "Utilities", "Transportation", "Investment", "Other"]
 currency = "VND"
 page_title = "Personal Finance Tracker"
 page_icon = ":money_with_wings:"  # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
