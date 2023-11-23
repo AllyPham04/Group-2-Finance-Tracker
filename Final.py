@@ -1,4 +1,7 @@
 import streamlit as st
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from streamlit_option_menu import option_menu
 from config import *
 from About_Us import info
@@ -28,6 +31,36 @@ with st.sidebar:
                 "nav-link-selected": {"background-color": "#519079"},
                 },
             )
+    with st.form(key='email_form'):
+        st.markdown('Before send email, going to your Google Account settings, clicking on \'Security\', and then turning on \'Less secure app access\'.')
+        email_sender = st.text_input('Your Email')
+        password = st.text_input('Password', type="password")
+        title = st.text_input('Title')
+        body = st.text_input('Body')
+
+        submit_button = st.form_submit_button(label='Send Email')
+    if submit_button:
+        try:
+            # Create the email
+            msg = MIMEMultipart()
+            msg['From'] = email_sender
+            msg['To'] = 'phamngoclinh3122004@gmail.com'
+            msg['Subject'] = title
+            msg.attach(MIMEText(body, 'plain'))
+
+            #Create the SMTP server
+            s = smtplib.SMTP('smtp.gmail.com', 587)
+            s.starttls()
+            s.login(email_sender, password)
+
+            # Send the email
+            s.send_message(msg)
+            st.success('Your error report has been sent successfully.')
+
+            s.quit()
+
+        except Exception as error:
+            st.error(f'An error occurred while sending the error report: {error}')
 
 if selected == "About Us":
     info()
