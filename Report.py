@@ -292,13 +292,13 @@ def rep():
                 st.header('Top Income')
                 rank_income_df = range_df[range_df['Type'] == 'Income'].copy()
                 rank_income_df = rank_income_df.groupby(['Category'])['Amount'].sum()
-                st.dataframe(rank_income_df)
+                st.dataframe(rank_income_df, use_container_width=True)
 
             with rank_expense:
                 st.header('Top Expense')
                 rank_expense_df = range_df[range_df['Type'] == 'Expense'].copy()
                 rank_expense_df = rank_expense_df.groupby('Category')['Amount'].sum()
-                st.dataframe(rank_expense_df)
+                st.dataframe(rank_expense_df, use_container_width=True)
 
         with range_col_quick_select:
             quick = st.columns([1, 1, 2])
@@ -307,11 +307,11 @@ def rep():
                 top_income_df = range_quick_df[range_quick_df['Type'] == 'Income'].copy()
                 top_income_df = top_income_df.groupby(['Category'])['Amount'].sum()
 
-                st.dataframe(top_income_df)
+                st.dataframe(top_income_df, use_container_width=True)
 
             with quick[1]:
                 st.header('Top Expense')
                 top_expense_df = range_quick_df[range_quick_df['Type'] == 'Expense'].copy()
                 top_expense_df = top_expense_df.groupby('Category')['Amount'].sum()
 
-                st.dataframe(top_expense_df)
+                st.dataframe(top_expense_df, use_container_width=True)
