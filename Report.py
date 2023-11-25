@@ -287,7 +287,7 @@ def rep():
 
     #Hiện total income và expense cho từng category trong khoảng thời gian user chọn
         with range_col_manual_select:
-            rank_income, rank_expense, tmp = st.columns([1,1,2])
+            rank_income, rank_expense, tmp = st.columns([1,1,2], gap="large")
             with rank_income:
                 st.header('Top Income')
                 rank_income_df = range_df[range_df['Type'] == 'Income'].copy()
@@ -301,7 +301,7 @@ def rep():
                 st.dataframe(rank_expense_df, use_container_width=True)
 
         with range_col_quick_select:
-            quick = st.columns([1, 1, 2])
+            quick = st.columns([1, 1, 2], gap="large")
             with quick[0]:
                 st.header('Top Income')
                 top_income_df = range_quick_df[range_quick_df['Type'] == 'Income'].copy()
