@@ -2,16 +2,14 @@ import streamlit as st
 import base64
 
 incomes = ["Salary", "Saving", "Bonus", "Interest", "Side Job", "Tax refund", "Other"]
-expenses = ["Food", "Household", "Subscription", "Health", "Entertainment", "Education", "Utilities", "Transportation", "Investment", "Other"]
+expenses = ["Food", "Household", "Subscription", "Health", "Entertainment", "Education", 
+            "Utilities", "Transportation", "Investment", "Other"]
 currency = "VND"
 page_title = "Personal Finance Tracker"
 page_icon = ":money_with_wings:"  # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
 layout = "wide"
 fontFamily = 'Candara'
 app_name = 'KEEPEE'
-user_income = []
-user_expense = []
-transactions = []
 
 def get_img_as_base64(file):
     with open(file, "rb") as f:
