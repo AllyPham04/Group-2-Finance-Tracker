@@ -9,9 +9,6 @@ page_icon = ":money_with_wings:"  # emojis: https://www.webfx.com/tools/emoji-ch
 layout = "wide"
 fontFamily = 'Candara'
 app_name = 'KEEPEE'
-user_income = []
-user_expense = []
-transactions = []
 
 def get_img_as_base64(file):
     with open(file, "rb") as f:
