@@ -1,5 +1,4 @@
 import streamlit as st
-import base64
 from config import *
 
 def info():
@@ -23,15 +22,17 @@ def info():
             <div class="snowflake">{flake1}</div>
             <div class="snowflake">{flake1}</div>
             <div class="snowflake">{flake1}</div>
-        """,
-            unsafe_allow_html=True, )
+            """,
+            unsafe_allow_html=True)
 
-        st.markdown(f"""<h1 style='text-align: center; font-family: {fontFamily}; font-size: 50px'>
-                {app_name}
-                </h1>""", unsafe_allow_html=True)
+        st.markdown(f"""<h1 style='text-align: center; 
+                    font-family: {fontFamily}; 
+                    font-size: 50px'>
+                    {app_name}
+                    </h1>""", unsafe_allow_html=True)
 
         col1_1, col1_2, col1_3 = st.columns([1,4,1])
-        col1_2.image('slogan.png',use_column_width=True)
+        col1_2.image('slogan.png', use_column_width=True)
 
         st.markdown(f"""<h4 style='font-family: {fontFamily}; margin-top: -30px;'>Our Team</h4>""", unsafe_allow_html=True)
         col2_1, col2_2, col2_3, col2_4 = st.columns(4)
