@@ -38,29 +38,29 @@ with st.sidebar:
         title = st.text_input('Title')
         body = st.text_input('Body')
 
-        submit_button = st.form_submit_button(label='Send Email')
-    if submit_button:
-        try:
-            # Create the email
-            msg = MIMEMultipart()
-            msg['From'] = email_sender
-            msg['To'] = 'phamngoclinh3122004@gmail.com'
-            msg['Subject'] = title
-            msg.attach(MIMEText(body, 'plain'))
+        submit_button = st.form_submit_button('Send Email')
+        if submit_button:
+            try:
+                # Create the email
+                msg = MIMEMultipart()
+                msg['From'] = email_sender
+                msg['To'] = 'phamngoclinh3122004@gmail.com'
+                msg['Subject'] = title
+                msg.attach(MIMEText(body, 'plain'))
 
-            #Create the SMTP server
-            s = smtplib.SMTP('smtp.gmail.com', 587)
-            s.starttls()
-            s.login(email_sender, password)
+                #Create the SMTP server
+                s = smtplib.SMTP('smtp.gmail.com', 587)
+                s.starttls()
+                s.login(email_sender, password)
 
-            # Send the email
-            s.send_message(msg)
-            st.success('Your error report has been sent successfully.')
+                # Send the email
+                s.send_message(msg)
+                st.success('Your error report has been sent successfully.')
 
-            s.quit()
+                s.quit()
 
-        except Exception as error:
-            st.error(f'An error occurred while sending the error report: {error}')
+            except Exception as error:
+                st.error(f'An error occurred while sending the error report: {error}')
 
 if selected == "About Us":
     info()
