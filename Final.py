@@ -46,7 +46,7 @@ with st.sidebar:
                 msg['From'] = email_sender
                 msg['To'] = 'phamngoclinh3122004@gmail.com'
                 msg['Subject'] = title
-                msg.attach(MIMEText(body, 'plain'))
+                msg.attach(MIMEText(body))
 
                 #Create the SMTP server
                 s = smtplib.SMTP('smtp.gmail.com', 587)
