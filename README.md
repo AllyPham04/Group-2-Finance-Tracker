@@ -22,4 +22,4 @@ python -m streamlit run Final.py
 * Bui Ngoc Bao Anh
 * Pham Ngoc Nhi
 
-### [KEEPEE App](https://group2-keepee.streamlit.app/)
+### [KEEPEE App](https://group-2-keepee.streamlit.app/)
