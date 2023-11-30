@@ -1,5 +1,4 @@
 import streamlit as st
-import base64
 from config import *
 
 def info():
@@ -7,28 +6,13 @@ def info():
 
     with main_col:
         background_about_us()
-
         local_css('style.css')
-        flake1 = "💸"
 
-        st.markdown(
-            f"""
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-        """,
-            unsafe_allow_html=True)
-
-        st.markdown(f"""<h1 style='text-align: center; font-family: {fontFamily}; font-size: 50px'>
-                {app_name}
-                </h1>""", unsafe_allow_html=True)
+        st.markdown(f"""<h1 style='text-align: center; 
+                    font-family: {fontFamily}; 
+                    font-size: 50px'>
+                    {app_name}
+                    </h1>""", unsafe_allow_html=True)
 
         col1_1, col1_2, col1_3 = st.columns([1,4,1])
         col1_2.image('slogan.png', use_column_width=True)

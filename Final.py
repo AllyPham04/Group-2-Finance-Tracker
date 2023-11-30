@@ -1,3 +1,4 @@
+import datetime as dt
 import streamlit as st
 import smtplib
 from email.mime.text import MIMEText
@@ -9,14 +10,15 @@ from Home import home
 from Set_budget import budget
 from Tracker import track
 from Report import rep
+from Rewind import rewind, not_rewind
 
-st.set_page_config(layout=layout)
+st.set_page_config(page_title='KEEPEE', page_icon='💸', layout=layout)
 
 with st.sidebar:
     selected = option_menu(
             menu_title=None,  # required
-            options=["About Us", "Home", "Set Budget", "Tracker", "Report"],
-            icons=["info", "house", "calculator", "database", "bar-chart-fill"], 
+            options=["About Us", "Home", "Set Budget", "Tracker", "Report", f"{dt.datetime.now().year} Rewind"],
+            icons=["info", "house", "calculator", "database", "bar-chart-fill"],
             default_index=0,  # optional
             styles={
                 "container": {"padding": "0!important", "background-color": "#FFFFFF"},
@@ -32,7 +34,11 @@ with st.sidebar:
                 },
             )
     with st.form(key='email_form'):
-        st.markdown('Before send email, going to your Google Account settings, clicking on \'Security\', and then turning on \'Less secure app access\'.')
+
+        st.markdown('''Whenever you have any problems, please let us know using the inbox below!''')
+        st.markdown('''Before send email, going to your Google Account settings, clicking on \'Security\', 
+                    and then turning on \'Less secure app access\'.''')
+
         email_sender = st.text_input('Your Email')
         password = st.text_input('Password', type="password")
         title = st.text_input('Title')
@@ -76,3 +82,8 @@ elif selected == "Tracker":
 
 elif selected == "Report":
     rep()
+
+elif selected == f"{dt.datetime.now().year} Rewind":
+    if dt.datetime.now().month >= 11:
+        rewind()
+    else: not_rewind()
