@@ -18,9 +18,15 @@ def rewind():
     if not history_df.empty:
         cate_amount_df = history_df.groupby('Type')['Category'].count().reset_index()
         amount_income = cate_amount_df[cate_amount_df['Type'] == 'Income']
-        count_income = amount_income['Category'].iloc[0]
+        if not amount_income.empty:
+            count_income = amount_income['Category'].iloc[0]
+        else:
+            count_income = 0
         amount_expense = cate_amount_df[cate_amount_df['Type'] == 'Expense']
-        count_expense = amount_expense['Category'].iloc[0]
+        if not amount_expense.empty:
+            count_expense = amount_expense['Category'].iloc[0]
+        else:
+            count_expense = 0
         # ---------------------------------------------------------------------------
         num_row = history_df.shape[0]
         # ---------------------------------------------------------------------------
