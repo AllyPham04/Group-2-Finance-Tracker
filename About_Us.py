@@ -6,24 +6,7 @@ def info():
 
     with main_col:
         background_about_us()
-
         local_css('style.css')
-        flake1 = "💸"
-
-        st.markdown(
-            f"""
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            <div class="snowflake">{flake1}</div>
-            """,
-            unsafe_allow_html=True)
 
         st.markdown(f"""<h1 style='text-align: center; 
                     font-family: {fontFamily}; 
