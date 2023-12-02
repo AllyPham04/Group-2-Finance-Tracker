@@ -221,6 +221,12 @@ def home():
             );
         ''')
 
+        def update_achievements_db():
+            c.execute('DELETE FROM achievements')
+            for achievement in st.session_state['earned_achievement']:
+                c.execute('INSERT INTO achievements (achievement) VALUES (?)', (achievement,))
+            conn.commit()
+
         #tạo file chứa các achievement để nó luôn hiện khi reload page
         if 'earned_achievement' not in st.session_state:
             c.execute('SELECT achievement FROM achievements')
@@ -283,14 +289,11 @@ def home():
                 st.success('Congratulations! You have earned the "Loyal User" achievement.')
                 mis1 = f'{calendar.month_name[now_vn.month]} / {now_vn.year} - Loyal User'
                 st.session_state['earned_achievement'].add(mis1)
-                c.execute('DELETE FROM achievements')
-                for achievement in st.session_state['earned_achievement']:
-                    c.execute('INSERT INTO achievements (achievement) VALUES (?)', (achievement,))
-                conn.commit()
+                update_achievements_db()
             
-        food_expenses = float(monthly_df[monthly_df['Category'] == 'Food']['Amount'].sum())
+        food_exp = float(monthly_df[monthly_df['Category'] == 'Food']['Amount'].sum())
 
-        clothes_expense = float(monthly_df[monthly_df['Category'] == 'Clothes']['Amount'].sum())
+        clothes_exp = float(monthly_df[monthly_df['Category'] == 'Clothes']['Amount'].sum())
 
         trans_exp = float(monthly_df[monthly_df['Category'] == 'Transportation']['Amount'].sum())
 
@@ -303,18 +306,16 @@ def home():
             mis2 = f'{calendar.month_name[now_vn.month]} / {now_vn.year} - Essential Saver'
             st.write('Your monthly expense (food, transportation, etc.) is no larger than 55% of your income.')
 
-            if not 0 < (food_expenses + clothes_expense + util_exp + trans_exp) <= 0.55 * income_month:
+            if not 0 < (food_exp + clothes_exp + util_exp + trans_exp) <= 0.55 * income_month:
                 st.error('You haven\'t achieved this goal! Keep working!')
                 if mis2 in st.session_state['earned_achievement']:
                     st.session_state['earned_achievement'].remove(mis2)
+                    update_achievements_db()
 
-            elif 0 < (food_expenses + clothes_expense + util_exp + trans_exp) <= 0.55 * income_month:
+            elif 0 < (food_exp + clothes_exp + util_exp + trans_exp) <= 0.55 * income_month:
                 st.success('Congratulations! You have earned the "Essential Saver" achievement.')
                 st.session_state['earned_achievement'].add(mis2)
-                c.execute('DELETE FROM achievements')
-                for achievement in st.session_state['earned_achievement']:
-                    c.execute('INSERT INTO achievements (achievement) VALUES (?)', (achievement,))
-                conn.commit()
+                update_achievements_db()
 
 
         #Nhiem vu 3: Financial freedom account
@@ -329,14 +330,12 @@ def home():
                 st.error('You haven\'t achieved this goal! Keep working!')
                 if mis3 in st.session_state['earned_achievement']:
                     st.session_state['earned_achievement'].remove(mis3)
+                    update_achievements_db()
 
             elif 0 < invest_exp <= income_month * 0.1:
                 st.success('Congratulations! You have earned the "Investor\'s Edge" achievement.')
                 st.session_state['earned_achievement'].add(mis3)
-                c.execute('DELETE FROM achievements')
-                for achievement in st.session_state['earned_achievement']:
-                    c.execute('INSERT INTO achievements (achievement) VALUES (?)', (achievement,))
-                conn.commit()
+                update_achievements_db()
                 
         #Nhiem vu 4: Education account
 
@@ -350,13 +349,12 @@ def home():
                 st.error('You haven\'t achieved this goal! Keep working!')
                 if mis4 in st.session_state['earned_achievement']:
                     st.session_state['earned_achievement'].remove(mis4)
+                    update_achievements_db()
+
             elif 0 < edu_exp <= 0.1 * income_month:
                 st.success('Congratulations! You have earned the "Academic Aces" achievement.')
                 st.session_state['earned_achievement'].add(mis4)
-                c.execute('DELETE FROM achievements')
-                for achievement in st.session_state['earned_achievement']:
-                    c.execute('INSERT INTO achievements (achievement) VALUES (?)', (achievement,))
-                conn.commit()
+                update_achievements_db()
 
                 
         #Nhiem vu 5: Long-term saving
@@ -371,14 +369,12 @@ def home():
                 st.error('You haven\'t achieved this goal! Keep working!')
                 if mis5 in st.session_state['earned_achievement']:
                     st.session_state['earned_achievement'].remove(mis5)
+                    update_achievements_db()
 
             elif 0 < saving_exp <= 0.1 * income_month:
                 st.success('Congratulations! You have earned the "Future Fortune Fund" achievement.')
                 st.session_state['earned_achievement'].add(mis5)
-                c.execute('DELETE FROM achievements')
-                for achievement in st.session_state['earned_achievement']:
-                    c.execute('INSERT INTO achievements (achievement) VALUES (?)', (achievement,))
-                conn.commit()
+                update_achievements_db()
         
         st.subheader('Achievement')
         for achievement in st.session_state['earned_achievement']:
