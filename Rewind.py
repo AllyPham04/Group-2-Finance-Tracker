@@ -158,7 +158,7 @@ def rewind():
                         font-size: {subheader_font_size};
                         font-weight: normal;
                         '>
-                        Your Income comes from {count_income} categories <br>
+                        Your Income comes from {count_income} transactions <br>
                         and {count_expense} for Expense
                         </h1>""", unsafe_allow_html=True)
 
