@@ -2,7 +2,7 @@ import streamlit as st
 import base64
 
 incomes = ["Salary", "Saving", "Bonus", "Interest", "Side Job", "Tax refund", "Other"]
-expenses = ["Food", "Household", "Subscription", "Health", "Entertainment", "Education", 
+expenses = ["Food", "Household", "Clothes", "Subscription", "Health", "Entertainment", "Education", 
             "Utilities", "Transportation", "Investment", "Other"]
 currency = "VND"
 page_title = "Personal Finance Tracker"
