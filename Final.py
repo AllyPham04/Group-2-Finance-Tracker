@@ -85,6 +85,6 @@ elif selected == "Report":
     rep()
 
 elif selected == f"{dt.datetime.now().year} Rewind":
-    if dt.datetime.now().month >= 11:
+    if dt.datetime.now().month == 12:
         rewind()
     else: not_rewind()
