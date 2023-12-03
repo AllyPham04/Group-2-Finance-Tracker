@@ -43,6 +43,7 @@ with st.sidebar:
         password = st.text_input('Password', type="password")
         title = st.text_input('Title')
         body = st.text_input('Body')
+        founder = ['phamngoclinh3122004@gmail.com', 'trong224466@gmail.com', 'Nhiphamngockang102@gmail.com', 'buianhbuianh25@gmail.com']
 
         submit_button = st.form_submit_button('Send Email')
         if submit_button:
@@ -50,7 +51,7 @@ with st.sidebar:
                 # Create the email
                 msg = MIMEMultipart()
                 msg['From'] = email_sender
-                msg['To'] = 'phamngoclinh3122004@gmail.com'
+                msg['To'] = ', '.join(founder)
                 msg['Subject'] = title
                 msg.attach(MIMEText(body))
 
