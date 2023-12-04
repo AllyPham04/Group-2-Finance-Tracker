@@ -16,10 +16,10 @@ st.set_page_config(page_title='KEEPEE', page_icon='💸', layout=layout)
 
 with st.sidebar:
     selected = option_menu(
-            menu_title=None,  # required
+            menu_title=None,
             options=["About Us", "Home", "Set Budget", "Tracker", "Report", f"{dt.datetime.now().year} Rewind"],
             icons=["info", "house", "calculator", "database", "bar-chart-fill"],
-            default_index=0,  # optional
+            default_index=0,
             styles={
                 "container": {"padding": "0!important", "background-color": "#FFFFFF"},
                 "icon": {"color": "#42B781", "font-size": "18px"},
