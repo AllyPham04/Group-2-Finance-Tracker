@@ -117,7 +117,7 @@ def track():
                 #Total saving
                 total_saving = history_df[(history_df['Type'] == 'Income') & (history_df['Category'] == 'Saving')]['Amount'].sum()
             else:
-                history_df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount'])
+                history_df = pd.DataFrame(columns=['Type', 'Date', 'Category', 'Amount', 'Note'])
                 col3_df = history_df.copy()
                 total_balance = 0
                 total_saving = 0
@@ -167,7 +167,7 @@ def track():
                     edit_df = edit_df.reset_index(drop=True)
                     edit_df.to_csv('data.csv', index=False, date_format="%d-%m-%Y")
                     st.success('Row deleted')
-                    st.experimental_rerun()
+                    st.rerun()
 
     st.session_state['previous_total_balance'] = total_balance
 
